@@ -1,0 +1,24 @@
+---
+title: "E155 Portfolio"
+image: images/headshot.png
+about:
+    template: jolla
+    links:
+        - icon: linkedin
+          text: LinkedIn
+          href: https://www.linkedin.com/in/caiyacoggshall/
+
+        - icon: github
+          text: Github
+          href: https://github.com/caiyacoggshall7
+
+        - text: Personal Portfolio
+          href: https://caiyacoggshall1.wixsite.com/caiya-coggshall/portfolio
+
+---
+
+Caiya Coggshall is a senior at Harvey Mudd College pursuing a Bachelor of Science in Engineering with a concentration in Mechanical, Manufacturing, and Computer systems. Her academic background spans design and manufacturing engineering, continuum mechanics, systems engineering, microprocessor systems, and electrical & magnetic circuits providing a strong foundation in both analytical and hands-on problem solving.
+
+​Some of her past experience involves fabricating and testing fixtures to support the development of a Class III medical device as a manufacturing engineering intern at E2. She's prototyped a fully mechanical autoinjector for hormonal acne treatment through Indomo. In research, she managed a cell vulture facility and contributed to experimental systems for cancer and nanoparticle drug delivery. On campus, she serves as a machine shop proctor, training students in milling, lathe operation, and various other tooling machines. Lastly, she leads as the external operations coordinator of the tours program at Harvey Mudd College.
+
+She's drawn to projects that build real, physical systems and approach every problem with curiosity, attention to detail, and a drive to make things that actually work.

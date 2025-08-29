@@ -1,0 +1,10 @@
+---
+title: "Reflection of Lab 1"
+description: "It's going"
+author: "Caiya"
+date: "8/27/25"
+categories:
+  - reflection
+  - labreport
+draft: false
+---
