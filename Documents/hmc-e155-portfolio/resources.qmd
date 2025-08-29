@@ -1,0 +1,12 @@
+---
+title: "E155 Resources"
+about:
+    template: jolla
+    links: 
+        - icon: Github
+          text: E155 Github
+          href: https://hmc-e155.github.io/
+---
+These labs are following online instructions written for E155:Microprocessor Systems. The Github can be found in the link below.
+
+Also a huge thank you to Professor Spencer, Brake, Harris, and all the amazing TAs for supporting me through this and prerequisite courses.

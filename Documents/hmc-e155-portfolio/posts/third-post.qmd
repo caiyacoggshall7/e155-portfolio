@@ -1,0 +1,10 @@
+---
+title: "Goals for MicroPs"
+description: "I took this course almost as a reminder that I CAN do hard things. Computer Hardware Engineering is not my specialty by any means but they aspect of being able to deliver a project that's entirely your own really motivates me. I want to really involve myself in the debugging process so that if something goes wrong in my industry career, I'm able to say 'oo this looks like a tough problem... but not as tough as microps so i got this'."
+author: "Caiya"
+date: "8/29/25"
+categories:
+  - reflection
+  - labreport
+draft: false
+---
