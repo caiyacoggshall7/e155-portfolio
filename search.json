@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "blog.html",
+    "href": "blog.html",
+    "title": "E155 Blog",
+    "section": "",
+    "text": "Goals for MicroPs\n\n\nI took this course almost as a reminder that I CAN do hard things. Computer Hardware Engineering is not my specialty by any means but they aspect of being able to deliver a project that’s entirely your own really motivates me. I want to really involve myself in the debugging process so that if something goes wrong in my industry career, I’m able to say ‘oo this looks like a tough problem… but not as tough as microps so i got this’.\n\n\n\n\n\nAug 29, 2025\n\n\nCaiya\n\n\n\n\n\n\n\n\n\n\n\n\nReflection of Lab 1\n\n\nIt’s going\n\n\n\n\n\nAug 27, 2025\n\n\nCaiya\n\n\n\n\n\n\n\n\n\n\n\n\nHello Quarto\n\n\nWelcome to my Quarto portfolio. I hope to fill this blog page with many more posts on my E155 experience!\n\n\n\n\n\nAug 26, 2025\n\n\nCaiya\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "E155 Portfolio",
+    "section": "",
+    "text": "Caiya Coggshall is a senior at Harvey Mudd College pursuing a Bachelor of Science in Engineering with a concentration in Mechanical, Manufacturing, and Computer systems. Her academic background spans design and manufacturing engineering, continuum mechanics, systems engineering, microprocessor systems, and electrical & magnetic circuits providing a strong foundation in both analytical and hands-on problem solving.\n​Some of her past experience involves fabricating and testing fixtures to support the development of a Class III medical device as a manufacturing engineering intern at E2. She’s prototyped a fully mechanical autoinjector for hormonal acne treatment through Indomo. In research, she managed a cell vulture facility and contributed to experimental systems for cancer and nanoparticle drug delivery. On campus, she serves as a machine shop proctor, training students in milling, lathe operation, and various other tooling machines. Lastly, she leads as the external operations coordinator of the tours program at Harvey Mudd College.\nShe’s drawn to projects that build real, physical systems and approach every problem with curiosity, attention to detail, and a drive to make things that actually work."
+  },
+  {
+    "objectID": "labs/lab1/lab1.html",
+    "href": "labs/lab1/lab1.html",
+    "title": "E155 Portfolio",
+    "section": "",
+    "text": "REPLACE In this lab, a design was implemented on the FPGA to demonstrate the functionality of the on-board high-speed oscillator by blinking one of the on-board LEDs. The high speed oscillator was configured at a frequency of 24 MHz and divided down using a counter to achieve a blinking frequency of ~1.5 Hz."
+  },
+  {
+    "objectID": "labs/lab1/lab1.html#lab-1-fpga-and-mcu-setup-and-testing",
+    "href": "labs/lab1/lab1.html#lab-1-fpga-and-mcu-setup-and-testing",
+    "title": "E155 Portfolio",
+    "section": "",
+    "text": "REPLACE In this lab, a design was implemented on the FPGA to demonstrate the functionality of the on-board high-speed oscillator by blinking one of the on-board LEDs. The high speed oscillator was configured at a frequency of 24 MHz and divided down using a counter to achieve a blinking frequency of ~1.5 Hz."
+  },
+  {
+    "objectID": "resources.html",
+    "href": "resources.html",
+    "title": "E155 Resources",
+    "section": "",
+    "text": "These labs are following online instructions written for E155:Microprocessor Systems. The Github can be found in the link below.\nAlso a huge thank you to Professor Spencer, Brake, Harris, and all the amazing TAs for supporting me through this and prerequisite courses."
+  }
+]
