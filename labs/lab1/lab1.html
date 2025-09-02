@@ -69,6 +69,35 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -158,10 +187,12 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#lab-1-fpga-and-mcu-setup-and-testing" id="toc-lab-1-fpga-and-mcu-setup-and-testing" class="nav-link active" data-scroll-target="#lab-1-fpga-and-mcu-setup-and-testing">Lab 1 : FPGA and MCU Setup and Testing</a>
   <ul class="collapse">
   <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#project-details" id="toc-project-details" class="nav-link" data-scroll-target="#project-details">Project Details</a></li>
   <li><a href="#design-and-testing-methodology" id="toc-design-and-testing-methodology" class="nav-link" data-scroll-target="#design-and-testing-methodology">Design and Testing Methodology</a></li>
-  <li><a href="#technical-documentation" id="toc-technical-documentation" class="nav-link" data-scroll-target="#technical-documentation">Technical Documentation</a></li>
+  <li><a href="#technical-documentations" id="toc-technical-documentations" class="nav-link" data-scroll-target="#technical-documentations">Technical Documentations</a></li>
   <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion">Results and Discussion</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#ai-prototype-summary" id="toc-ai-prototype-summary" class="nav-link" data-scroll-target="#ai-prototype-summary">AI Prototype Summary</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -176,25 +207,217 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="lab-1-fpga-and-mcu-setup-and-testing">Lab 1 : FPGA and MCU Setup and Testing</h2>
 <section id="introduction" class="level3">
 <h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
-<p>REPLACE In this lab, a design was implemented on the FPGA to demonstrate the functionality of the on-board high-speed oscillator by blinking one of the on-board LEDs. The high speed oscillator was configured at a frequency of 24 MHz and divided down using a counter to achieve a blinking frequency of ~1.5 Hz.</p>
+<p>In this lab, we soldered a full development board and implemented a design on the FPGA to demonstrate the functionality of the on-board high-speed oscillator by blinking the on-board LEDs. The high speed oscillator was configured at a frequency of 48 MHz and divided down using a counter to achieve a blinking frequency of ~2.4 Hz. Additionally I wired a 7-segment display to my FPGA board and was able to display all sixteen hexadecimal digits using the red segments.</p>
+</section>
+<section id="project-details" class="level3">
+<h3 class="anchored" data-anchor-id="project-details">Project Details</h3>
+<p>The development board was built using many SMT and THT parts which helped revive some useful soldering skills and practice using soldering paste to secure surface mount components.</p>
+<p>Powering and testing the board involved confirming everything was soldered as intended. I checked the LEDs could blink when programmed at 1 Hz as well as how much power each component was receiving. However, actually connecting the Lattice Radiant software proved difficult as the MCU wasn’t able to detect the J-link at all and the FPGA required a lot of “witchcraft” in order to be read.</p>
+<p>After thoroughly testing the board I dusted off my digital design chops and wrote some verilog code in my top module to operate the LEDs on the board in relation to the switches and clocks. The relationship between the inputs and LEDs was given as the following:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Signal Name</th>
+<th>Signal Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>clk</td>
+<td>input</td>
+<td>48 MHz clock on FPGA</td>
+</tr>
+<tr class="even">
+<td>s[3:0]</td>
+<td>input</td>
+<td>the four DIP switches (on the board, SW6)</td>
+</tr>
+<tr class="odd">
+<td>led[2:0]</td>
+<td>output</td>
+<td>3 LEDs (you may use the on-board LEDs)</td>
+</tr>
+<tr class="even">
+<td>seg[6:0]</td>
+<td>output</td>
+<td>the segments of a common-anode 7-segment display</td>
+</tr>
+</tbody>
+</table>
+<p>The following table is the relationship between LEDs that was given to us:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>S1</th>
+<th>S0</th>
+<th>led[0]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0</td>
+<td>OFF</td>
+</tr>
+<tr class="even">
+<td>0</td>
+<td>1</td>
+<td>ON</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>ON</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>OFF</td>
+</tr>
+</tbody>
+</table>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>S1</th>
+<th>S0</th>
+<th>led[1]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0</td>
+<td>0</td>
+<td>OFF</td>
+</tr>
+<tr class="even">
+<td>0</td>
+<td>1</td>
+<td>OFF</td>
+</tr>
+<tr class="odd">
+<td>1</td>
+<td>0</td>
+<td>OFF</td>
+</tr>
+<tr class="even">
+<td>1</td>
+<td>1</td>
+<td>ON</td>
+</tr>
+</tbody>
+</table>
+<p>while led[2] wasn’t based on a truth table and instead needed to blink at 2.4 Hz.</p>
+<p>In addition to the LEDs the 7-segment display needed to display a single hexdecimal digit from 0x0 through 0xF. This was done by programming each segment of the display to be controlled by a 4 bit binary number that could be set via one of the switches.</p>
 </section>
 <section id="design-and-testing-methodology" class="level3">
 <h3 class="anchored" data-anchor-id="design-and-testing-methodology">Design and Testing Methodology</h3>
+<section id="led-design" class="level4">
+<h4 class="anchored" data-anchor-id="led-design">LED Design</h4>
+<p>Since the code for the LEDs was pretty simple I decided to combine those with my top down module. To start, I looked at the truth tables for led[0] and led[1] and realized that it was simply a XOR and AND gate, respectively. These can be written with simple verilog logic lines. From there, I started by approaching the 2.4 Hz led[2] by writing some expensive mod (%) logic but quickly abandoned that for a more intuitive answer. I could calculate the value that I wanted to reset the led at as:</p>
+<p><span class="math display">\[
+((1/2.4 \text{ Hz}) * 48000000 \text{ Hz/count})/2 = 10000000 \text{ counts}
+\]</span></p>
+<p>Where the 48 MHz clk is per 1 cycle. So dividing it by the 2.4 Hz frequency for led[2], I can determine the amount of cycles to toggle led[2] to represent a 2.4 Hz signal. This whole count is then divided by 2 because I want this cycle to flash the led which would mean turning it on and then turning it off. So I turn it on for half of the cycle count (i.e at 10,000,000 counts) and off for the other half. This was confirmed by probing that pin on an oscilloscope.</p>
 </section>
-<section id="technical-documentation" class="level3">
-<h3 class="anchored" data-anchor-id="technical-documentation">Technical Documentation</h3>
+<section id="seven-segment-design" class="level4">
+<h4 class="anchored" data-anchor-id="seven-segment-design">Seven Segment Design</h4>
+<p>For the seven segment design I knew we were receiving a 4 bit binary number s[3:0] and needed to convert that to different segments of the 7-segment display. The 7-segment display is common anode (active low wired) so that meant that when I wrote out a long list of what each number and letter would illuminate and which corresponding segments needed to be triggered, 0 indicated ON. Once I had my code for that I wrote some case statement code to account for all possible number/letter inputs and what their corresponding seg[6:0] seven bit sequence would be.</p>
+<p>I later wired it on a breadboard to GPIO pins and did a calculation as seen below (in Figure 1) to verify the current draw for the segments was within recommended operating conditions:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1484.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 1: Current Calculations</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="technical-documentations" class="level3">
+<h3 class="anchored" data-anchor-id="technical-documentations">Technical Documentations</h3>
+<p>All the code for the project can be found in the following <a href="https://github.com/caiyacoggshall7/e155-lab1">Github repository.</a></p>
 <section id="block-diagram" class="level4">
 <h4 class="anchored" data-anchor-id="block-diagram">Block Diagram</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1480.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 2: Block Diagram of Verilog Design</figcaption>
+</figure>
+</div>
+<p>The block diagram in Figure 2 demonstrates the overall architecture of the design. I created two models, one being my top-level model with my led code and my 7-segment display module too.</p>
 </section>
 <section id="schematic" class="level4">
 <h4 class="anchored" data-anchor-id="schematic">Schematic</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1485.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 3: Schematic of Physical Circuit</figcaption>
+</figure>
+</div>
+<p>The schematic as seen in Figure 3 shows the layout of the circuit design. It has internal 100 kΩ pullup resistors to make sure the active low reset pin doesn’t float and then the output LED was connected to a current limiting resistor to make sure the output current didn’t exceed the max output current of the FPGA I/O pins. Refer to Figure 1.</p>
 </section>
 </section>
 <section id="results-and-discussion" class="level3">
 <h3 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h3>
+<p>After finally coding everything and uploading,debugging and building, my board successfully met all specifications!</p>
+<p>That is, I was able to produce the correct waveforms for both my top level module testbench (as seen in Figure 4)and my seven segment display test bench (Figure 5).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/lab1tb.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 4: Waveforms of lab1_testbench</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/sevenseg.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 5: Waveforms of seven_seg_testbench</figcaption>
+</figure>
+</div>
+<p>Everything passed the testvectors showing that the code simulated correctly!</p>
+<p>Additionally I was able to record images of some of the LED logic (Figure 6) as well as hexadecimal digits 0x7 and 0xC from the seven segment display (Figure 7 &amp; 8).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1481.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 6: Image of led[2] and led[0] on</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1482.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 7: Seven Segment display for 0x7</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1483.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 8: Seven Segment display for 0xC</figcaption>
+</figure>
+</div>
 </section>
 <section id="conclusion" class="level3">
 <h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>To conclude, I successfully soldered a whole development board, blinked an led at 2.4 Hz, designed other leds to go off according to gate logic, and coded a seven-segment display to display sixteen hexadecimal digits.</p>
+<p>I spent a total of ~ 46 hours working on this lab. I wish that number was not my reality but since I religiously document every work block on google calendar I know its an accurate representation of how long I spent on lab 1. Unfortunately, so many issues just kept popping up with the program that troubleshooting ended up stretching out a while.</p>
+</section>
+<section id="ai-prototype-summary" class="level3">
+<h3 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h3>
+<p>I used ChatGPT 5 Auto as my LLM for this assignment. I then entered in the following prompt:</p>
+<pre><code>"Write SystemVerilog HDL to leverage the internal high speed oscillator in the Lattice UP5K FPGA and blink an LED at 2 Hz. Take full advantage of SystemVerilog syntax, for example, using logic instead of wire and reg."</code></pre>
+<p>It started by writing two modules, one for blinking the led at 2 Hz and the other as my top-level module. It started having errors of being unable to instantiate the clock or unexpected parameters. After a little back and forth (about 4 tries), Chat GPT 5 was able to finally synthesize.</p>
+<p>The toggling logic it produced for the led_blinker_2hz module was intuitive to understand and similar to how I set up my code. The top-level was also decently simplistic and used the basics of the clock to call on the other modules. The system verilog code photos can be found in Figures 9 and 10.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/led.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 9: AI Code to Toggle LED</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/topblink.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 10: AI Code for the Top Level Module</figcaption>
+</figure>
+</div>
+<p>It’s unclear to me whether this code would work past synthesis but the LLM was definitely able to set up a framework for the system verilog code that (if understood) could really help in speeding up hardware engineering work flows.</p>
 
 
 </section>
