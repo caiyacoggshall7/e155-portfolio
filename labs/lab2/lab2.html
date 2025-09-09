@@ -257,7 +257,8 @@ ul.task-list li input[type="checkbox"] {
 <figcaption>Figure 7: Waveforms of multiplex testbench</figcaption>
 </figure>
 </div>
-<p>Figure 7 shows the multiplex HDL module working where s receives either the front 4 bits or back 4 bits of s2count on the next clock cycle. This makes sense because in the test bench I’m setting the 8 bit input and instantiating my multiplex HDL module code on that clock cycyle. So on the next clock cycle I get an s output from my multiplex code while my s2count increments to a new number. This is explains the 1 cycle mismatch on the waveforms.</p>
+<p>Figure 7 shows the multiplex HDL module working where s receives either the front 4 bits or back 4 bits of s2count on the next clock cycle. This makes sense because in the test bench I’m setting the 8 bit input and instantiating my multiplex HDL module code on that clock cycle. So on the next clock cycle I get an s output from my multiplex code while my s2count increments to a new number. This is explains the 1 cycle mismatch on the waveforms.</p>
+<p>Also, this image shows that it get’s the correct 4 bits of s2count because in this image enable[0] is ON and enable[1] is OFF which means that s2count is receiving bit’s [3:0] which is what we see on the waveform.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/lab2multitbenable.png" class="img-fluid figure-img"></p>
