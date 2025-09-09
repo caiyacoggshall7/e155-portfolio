@@ -218,7 +218,13 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="results-and-discussion" class="level3">
 <h3 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h3>
-<p>After many</p>
+<p>After many of decoding</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/lab1tb.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 4: Waveforms of lab1_testbench</figcaption>
+</figure>
+</div>
 </section>
 <section id="conclusion" class="level3">
 <h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
@@ -327,6 +333,128 @@ module two_digit_mux_from_one_decoder #(
 endmodule</code></pre>
 <p>I started a new conversation and entered the following prompt, now with my own files:</p>
 <pre><code>"Write SystemVerilog HDL to time multiplex a single seven segment decoder (that decodes from four bits to a common anode seven segment display) to decode two sets of input bits and drive two sets of seven output bits. Use the seven segment decoder and oscillator provided in the attached files."</code></pre>
+<p>The code it produced was the following:</p>
+<pre><code>// ===============================================================
+// Dual 7-seg time-multiplex core (uses a single decoder instance)
+// ===============================================================
+module dual_sevenseg_mux_core #(
+    // Choose which counter bit to use for refresh.
+    // With an ~48 MHz HFOSC, REFRESH_BIT=15 gives ~1.46 kHz toggle (~730 Hz per digit).
+    // You can tune this as needed; anything ~200 Hz–1 kHz per digit looks steady.
+    parameter int REFRESH_BIT = 15
+) (
+    input  logic        clk,
+    input  logic        reset,       // async or sync is fine; used synchronously below
+    input  logic [3:0]  a,           // first  digit value (0..F)
+    input  logic [3:0]  b,           // second digit value (0..F)
+    output logic [6:0]  seg_a,       // 7-seg bus for digit A (common-anode, active-low)
+    output logic [6:0]  seg_b        // 7-seg bus for digit B (common-anode, active-low)
+);
+
+    // ----------------------------------------------------------------
+    // Refresh divider: toggles which digit is active
+    // ----------------------------------------------------------------
+    logic [REFRESH_BIT:0] div;
+    always_ff @(posedge clk) begin
+        if (reset) div &lt;= '0;
+        else       div &lt;= div + 1'b1;
+    end
+    logic sel;                // 0 =&gt; drive A, 1 =&gt; drive B
+    assign sel = div[REFRESH_BIT];
+
+    // ----------------------------------------------------------------
+    // Single shared decoder
+    // ----------------------------------------------------------------
+    logic [3:0]  nibble_mux;
+    logic [6:0]  seg_decoded;
+
+    always_comb begin
+        nibble_mux = (sel == 1'b0) ? a : b;
+    end
+
+    // Your provided decoder (common-anode, active-low segment map)
+    seven_seg_display ssd_inst (
+        .s   (nibble_mux),
+        .seg (seg_decoded)
+    );
+
+    // ----------------------------------------------------------------
+    // Gate the outputs: one bus shows the decoded pattern while the
+    // other is driven "all off" (all 1's for common-anode).
+    // ----------------------------------------------------------------
+    always_comb begin
+        // default = OFF
+        seg_a = 7'b111_1111;
+        seg_b = 7'b111_1111;
+
+        if (sel == 1'b0) begin
+            seg_a = seg_decoded;     // show A
+        end else begin
+            seg_b = seg_decoded;     // show B
+        end
+    end
+
+endmodule
+
+
+// ===============================================================
+// Example top: instantiate on-chip HFOSC, then the core above
+// ===============================================================
+// If your flow already provides a clock (or if you have a different
+// oscillator wrapper), you can skip this top and hook the core up from
+// your own top-level.
+//
+// Notes for iCE40 UP5K:
+// - SB_HFOSC is the built-in high-frequency oscillator primitive.
+// - CLKHF_DIV parameter controls the internal divisor (00=48 MHz, 01=24 MHz, 10=12 MHz, 11=6 MHz).
+// - Drive CLKHFEN=1 and CLKHFPU=1 to enable and power up the oscillator.
+module top_dual_sevenseg (
+    input  logic       reset,     // active-high
+    input  logic [3:0] a,
+    input  logic [3:0] b,
+    output logic [6:0] seg_a,     // to 7-seg A (common-anode, active-low)
+    output logic [6:0] seg_b      // to 7-seg B (common-anode, active-low)
+);
+    // -------------------------
+    // On-chip HF oscillator
+    // -------------------------
+    logic clk_hf;
+
+`ifdef ICE40
+    // Lattice iCE40 HFOSC primitive
+    SB_HFOSC #(
+        .CLKHF_DIV("0b00") // 48 MHz
+    ) u_hfosc (
+        .CLKHF   (clk_hf),
+        .CLKHFEN (1'b1),
+        .CLKHFPU (1'b1)
+    );
+`else
+    // If you’re simulating or targeting a different device, replace this with your board clock.
+    // For sim, you can drive 'clk_hf' from a testbench.
+    // synthesis translate_off
+    initial clk_hf = 1'b0;
+    always #10 clk_hf = ~clk_hf; // 50 MHz sim clock
+    // synthesis translate_on
+`endif
+
+    // -------------------------
+    // Multiplexing core
+    // -------------------------
+    dual_sevenseg_mux_core #(
+        .REFRESH_BIT(15)   // tune as desired
+    ) u_mux (
+        .clk   (clk_hf),
+        .reset (reset),
+        .a     (a),
+        .b     (b),
+        .seg_a (seg_a),
+        .seg_b (seg_b)
+    );
+
+endmodule</code></pre>
+<p>This one got an error on the first synthesis for instantiating an unknown module (seven)_seg), which actually just ened up requiring me to add my Lab 1 seven_seg_display.sv HDL module into the project and then it worked!</p>
+<p>This is all to say it’s honestly a little frustrating that AI is able to get the code so fast because it feels like it devalues all the time I spend on the code for the lab. However, I will say (and this may be from my lack of SV knowledge), a lot of the code isn’t the most intuitive to me.</p>
 
 
 </section>
