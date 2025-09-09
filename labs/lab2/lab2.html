@@ -150,8 +150,19 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#lab-2-multiplexed-7-segment-display" id="toc-lab-2-multiplexed-7-segment-display" class="nav-link active" data-scroll-target="#lab-2-multiplexed-7-segment-display">Lab 2 : Multiplexed 7-Segment Display</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#design-and-testing-methodology" id="toc-design-and-testing-methodology" class="nav-link" data-scroll-target="#design-and-testing-methodology">Design and Testing Methodology</a></li>
+  <li><a href="#technical-documentation" id="toc-technical-documentation" class="nav-link" data-scroll-target="#technical-documentation">Technical Documentation</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -159,8 +170,47 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<section id="lab-2-multiplexed-7-segment-display" class="level2">
+<h2 class="anchored" data-anchor-id="lab-2-multiplexed-7-segment-display">Lab 2 : Multiplexed 7-Segment Display</h2>
+<section id="introduction" class="level3">
+<h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
+<p>In this lab I implemented a time-multiplexing scheme to drive two seven-segment displays using the same seven-segment decoder HDL module and set of FPGA GPIO pins. This lab involved some fun hardware wiring and intense System Verilog.</p>
+</section>
+<section id="design-and-testing-methodology" class="level3">
+<h3 class="anchored" data-anchor-id="design-and-testing-methodology">Design and Testing Methodology</h3>
+<p>In this lab an on-board high-speed oscillator (HSOSC) from the iCE40 UltraPlus primitive library was used to generate a clock signal at 24 MHz.</p>
+<section id="led-design" class="level4">
+<h4 class="anchored" data-anchor-id="led-design">LED Design</h4>
+<p>There were 5 LEDs that summed the values from the two hexadecimal display numbers together. This was done via one combinational logic line an HDL module, adding the two 4 bit inputs together and then wiring each LED to it’s own GPIO pin.</p>
+</section>
+</section>
+<section id="technical-documentation" class="level3">
+<h3 class="anchored" data-anchor-id="technical-documentation">Technical Documentation</h3>
+<p>All the code for the project can be found in the following <a href="https://github.com/caiyacoggshall7/e155-lab2">Github repository.</a></p>
+<section id="block-diagram" class="level4">
+<h4 class="anchored" data-anchor-id="block-diagram">Block Diagram</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1518.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 2: Block Diagram of Verilog Design</figcaption>
+</figure>
+</div>
+<p>The block diagram in Figure 2 demonstrates the overall architecture of my design. I had three main modules, one for my multiplexer code (i.e choosing which input and power to turn on), one for my seven segment code (i.e telling which segments to light up based on input), and the top module containing everything as well as the high speed oscillator andcombinational LED logic.</p>
+</section>
+<section id="schematic" class="level4">
+<h4 class="anchored" data-anchor-id="schematic">Schematic</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1519.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 3: Schematic of Physical Circuit</figcaption>
+</figure>
+</div>
+<p>The schematic as seen in Figure 3 shows the layout of the circuit design. It has internal 100 kΩ pullup resistors to make sure the active low reset pin doesn’t float and then the output LED and PNP transistors were connected to a current limiting resistor to make sure the output current didn’t exceed the max output current of the FPGA I/O pins. With the connection from the FPGA to the Dual Seven Segment Display, I could have wired the board with only 7 resistors and it would have worked just as well but this method was slightly more intuitive and so what I choose to go with. Refer to Figure 1 for resistor calculations.</p>
 
 
+</section>
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
