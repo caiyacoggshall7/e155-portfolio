@@ -220,11 +220,28 @@ ul.task-list li input[type="checkbox"] {
 <h4 class="anchored" data-anchor-id="schematic">Schematic</h4>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/IMG_1593.jpg" class="img-fluid figure-img"></p>
+<p><img src="images/IMG_1595.jpg" class="img-fluid figure-img"></p>
 <figcaption>Figure 3: Schematic of Physical Circuit</figcaption>
 </figure>
 </div>
 <p>The schematic as seen in Figure 3 shows the layout of the circuit design. It has 4 GPIO pins routing to the FPGA as the input rows with pulldowns of 680 Ohms and an internal 100 kΩ pullup resistor to make sure the active low reset pin doesn’t float. The output LED and PNP transistors were connected to a current limiting resistor to make sure the output current didn’t exceed the max output current of the FPGA I/O pins. With the connection from the FPGA to the Dual Seven Segment Display, I could have wired the board with only 7 resistors and it would have worked just as well but this method was slightly more intuitive and so what I choose to go with. Refer to Figure 1 for resistor calculations. Compared to lab 2 I additionally had a keypad where I looped through the columns and had inputs of the rows.</p>
+</section>
+<section id="state-transition-diagrams-fsms" class="level4">
+<h4 class="anchored" data-anchor-id="state-transition-diagrams-fsms">State Transition Diagrams (FSMs)</h4>
+<p>I created a few modules based off of FSMs as seen below.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1590.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 4: FSM of debounce.sv module</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1591.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 5: 4 state FSM of keyscanner.sv module</figcaption>
+</figure>
+</div>
+<p>![Figure 6: 16 state FSM of keyscanner.sv module]</p>
 </section>
 </section>
 <section id="results-and-discussion" class="level3">
@@ -233,49 +250,49 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/toplab3.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 4: Waveforms of top module</figcaption>
+<figcaption>Figure 7: Waveforms of top module</figcaption>
 </figure>
 </div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/toplab3_2.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 5: Waveforms of top module pt.2</figcaption>
+<figcaption>Figure 8: Waveforms of top module pt.2</figcaption>
 </figure>
 </div>
 <p>These can be seen entering the debounce and IDLE states as well as pulseenable going off as expected. This validates my debouncing logic.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/sevenseg.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 6: Waveforms of seven_seg_testbench</figcaption>
+<figcaption>Figure 9: Waveforms of seven_seg_testbench</figcaption>
 </figure>
 </div>
-<p>Figure 4 shows the seven_seg_display HDL module works against the test vectors I wrote.</p>
+<p>Figure 9 shows the seven_seg_display HDL module works against the test vectors I wrote.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/lab2multitb2.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 7: Waveforms of multiplex testbench</figcaption>
+<figcaption>Figure 10: Waveforms of multiplex testbench</figcaption>
 </figure>
 </div>
-<p>Figure 7 shows the multiplex HDL module working where s receives either the front 4 bits or back 4 bits of s2count on the next clock cycle. This makes sense because in the test bench I’m setting the 8 bit input and instantiating my multiplex HDL module code on that clock cycle. So on the next clock cycle I get an s output from my multiplex code while my s2count increments to a new number. This is explains the 1 cycle mismatch on the waveforms.</p>
+<p>Figure 10 shows the multiplex HDL module working where s receives either the front 4 bits or back 4 bits of s2count on the next clock cycle. This makes sense because in the test bench I’m setting the 8 bit input and instantiating my multiplex HDL module code on that clock cycle. So on the next clock cycle I get an s output from my multiplex code while my s2count increments to a new number. This is explains the 1 cycle mismatch on the waveforms.</p>
 <p>Also, this image shows that it get’s the correct 4 bits of s2count because in this image enable[0] is ON and enable[1] is OFF which means that s2count is receiving bit’s [3:0] which is what we see on the waveform.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/lab2multitbenable.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 8: Waveforms of multiplex testbench showing enable toggle</figcaption>
+<figcaption>Figure 11: Waveforms of multiplex testbench showing enable toggle</figcaption>
 </figure>
 </div>
-<p>Figure 8 shows Figure 7 again but run for a longer time period to show the enable toggling.</p>
+<p>Figure 11 shows Figure 10 again but run for a longer time period to show the enable toggling.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/sync.png.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 9: Waveforms of synchronizer module</figcaption>
+<figcaption>Figure 12: Waveforms of synchronizer module</figcaption>
 </figure>
 </div>
 <p>We can see the synchronizer offset by two clock cycles as expected!</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/keyscan.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 10: Waveforms of of the keyscanner module cycling as expected</figcaption>
+<figcaption>Figure 13: Waveforms of of the keyscanner module cycling as expected</figcaption>
 </figure>
 </div>
 <p>These are all my testbenches as seen in the figures abover</p>
@@ -283,7 +300,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="conclusion" class="level3">
 <h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
 <p>Total Hours Spent on Lab: 67 hours</p>
-<p>This lab was incredibly frustrating at times and seemingly impossible at others. It was tough. That being said, a ricketly profiency is the goal.</p>
+<p>This lab was incredibly frustrating at times and seemingly impossible at others. It was tough. That being said, a rickety profiency is the goal.</p>
 </section>
 <section id="ai-prototype-summary" class="level3">
 <h3 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h3>
