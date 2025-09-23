@@ -150,8 +150,22 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#lab-2-multiplexed-7-segment-display" id="toc-lab-2-multiplexed-7-segment-display" class="nav-link active" data-scroll-target="#lab-2-multiplexed-7-segment-display">Lab 2 : Multiplexed 7-Segment Display</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#design-and-testing-methodology" id="toc-design-and-testing-methodology" class="nav-link" data-scroll-target="#design-and-testing-methodology">Design and Testing Methodology</a></li>
+  <li><a href="#technical-documentation" id="toc-technical-documentation" class="nav-link" data-scroll-target="#technical-documentation">Technical Documentation</a></li>
+  <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion">Results and Discussion</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#ai-prototype-summary" id="toc-ai-prototype-summary" class="nav-link" data-scroll-target="#ai-prototype-summary">AI Prototype Summary</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -159,8 +173,124 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<section id="lab-2-multiplexed-7-segment-display" class="level2">
+<h2 class="anchored" data-anchor-id="lab-2-multiplexed-7-segment-display">Lab 2 : Multiplexed 7-Segment Display</h2>
+<section id="introduction" class="level3">
+<h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
+<p>In this lab I built off of Lab 2 to implement a time-multiplexing keypad scanner to drive two seven-segment displays using the same seven-segment decoder HDL module and set of FPGA GPIO pins. When a key was pressed, the design would indicate that it was pressed and record that number on the right of the dual seven seg display. Once another button was pressed, the previous digit would shift to the left hand place and the new digit would fill the right.</p>
+</section>
+<section id="design-and-testing-methodology" class="level3">
+<h3 class="anchored" data-anchor-id="design-and-testing-methodology">Design and Testing Methodology</h3>
+<p>In this lab I used an on-board high-speed oscillator (HSOSC) from the iCE40 UltraPlus primitive library was used to generate a clock signal at 24 MHz, this was the slow clock that all modules were implemented on. Additionally a synchronizer was added to delay the inputs by two clock cycles but the implementation of that was questionably buggy…</p>
+<section id="led-design" class="level4">
+<h4 class="anchored" data-anchor-id="led-design">LED Design</h4>
+<p>There were 4 LEDs (3 SMT, one GPIO pin) that I used to debug. I would sometimes have them indicate the row that was being pressed or the columns it was cycling on.</p>
+</section>
+<section id="current-calculations" class="level4">
+<h4 class="anchored" data-anchor-id="current-calculations">Current Calculations</h4>
+<p>Current calculations for PNP Transistors, and Dual Seven Segment Display remained the same from Lab 2. See the calculations below in Figure 1. An additional 680 Ohm resistor was added as pull downs for the rows.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1520.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 1.1: Current Calculations</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1521.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 1.2: Current Calculations</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="technical-documentation" class="level3">
+<h3 class="anchored" data-anchor-id="technical-documentation">Technical Documentation</h3>
+<p>All the code for the project can be found in the following [Github repository.]</p>
+<section id="block-diagram" class="level4">
+<h4 class="anchored" data-anchor-id="block-diagram">Block Diagram</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1589.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 2: Block Diagram of Verilog Design</figcaption>
+</figure>
+</div>
+<p>The block diagram in Figure 2 demonstrates the overall architecture of my design. I had eight main modules, two fsms (one for column scanning and one for debouncing), one for decoding (i.e translating a column row encoding to a binary bits representing a number on the keypad &amp; updating the new press), one to synchronize the code, one as a slow clk to slow down the high speed oscillator, one for my multiplexer code (i.e choosing which input and power to turn on), one for my seven segment code (i.e telling which segments to light up based on input), and the top module containing everything as well as the high speed oscillator.</p>
+</section>
+<section id="schematic" class="level4">
+<h4 class="anchored" data-anchor-id="schematic">Schematic</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1593.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 3: Schematic of Physical Circuit</figcaption>
+</figure>
+</div>
+<p>The schematic as seen in Figure 3 shows the layout of the circuit design. It has 4 GPIO pins routing to the FPGA as the input rows with pulldowns of 680 Ohms and an internal 100 kΩ pullup resistor to make sure the active low reset pin doesn’t float. The output LED and PNP transistors were connected to a current limiting resistor to make sure the output current didn’t exceed the max output current of the FPGA I/O pins. With the connection from the FPGA to the Dual Seven Segment Display, I could have wired the board with only 7 resistors and it would have worked just as well but this method was slightly more intuitive and so what I choose to go with. Refer to Figure 1 for resistor calculations. Compared to lab 2 I additionally had a keypad where I looped through the columns and had inputs of the rows.</p>
+</section>
+</section>
+<section id="results-and-discussion" class="level3">
+<h3 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h3>
+<p>I was able to write some testbenches depicting the modules working as intended. Learned how to use tranif!</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/toplab3.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 4: Waveforms of top module</figcaption>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/toplab3_2.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 5: Waveforms of top module pt.2</figcaption>
+</figure>
+</div>
+<p>These can be seen entering the debounce and IDLE states as well as pulseenable going off as expected. This validates my debouncing logic.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/sevenseg.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 6: Waveforms of seven_seg_testbench</figcaption>
+</figure>
+</div>
+<p>Figure 4 shows the seven_seg_display HDL module works against the test vectors I wrote.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/lab2multitb2.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 7: Waveforms of multiplex testbench</figcaption>
+</figure>
+</div>
+<p>Figure 7 shows the multiplex HDL module working where s receives either the front 4 bits or back 4 bits of s2count on the next clock cycle. This makes sense because in the test bench I’m setting the 8 bit input and instantiating my multiplex HDL module code on that clock cycle. So on the next clock cycle I get an s output from my multiplex code while my s2count increments to a new number. This is explains the 1 cycle mismatch on the waveforms.</p>
+<p>Also, this image shows that it get’s the correct 4 bits of s2count because in this image enable[0] is ON and enable[1] is OFF which means that s2count is receiving bit’s [3:0] which is what we see on the waveform.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/lab2multitbenable.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 8: Waveforms of multiplex testbench showing enable toggle</figcaption>
+</figure>
+</div>
+<p>Figure 8 shows Figure 7 again but run for a longer time period to show the enable toggling.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/sync.png.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 9: Waveforms of synchronizer module</figcaption>
+</figure>
+</div>
+<p>We can see the synchronizer offset by two clock cycles as expected!</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/keyscan.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 10: Waveforms of of the keyscanner module cycling as expected</figcaption>
+</figure>
+</div>
+<p>These are all my testbenches as seen in the figures abover</p>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>Total Hours Spent on Lab: 67 hours</p>
+<p>This lab was incredibly frustrating at times and seemingly impossible at others. It was tough.</p>
+</section>
+<section id="ai-prototype-summary" class="level3">
+<h3 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h3>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
