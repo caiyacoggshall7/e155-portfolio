@@ -150,8 +150,23 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#lab-4-digital-audio" id="toc-lab-4-digital-audio" class="nav-link active" data-scroll-target="#lab-4-digital-audio">Lab 4 : Digital Audio</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#project-details" id="toc-project-details" class="nav-link" data-scroll-target="#project-details">Project Details</a></li>
+  <li><a href="#design-and-testing-methodology" id="toc-design-and-testing-methodology" class="nav-link" data-scroll-target="#design-and-testing-methodology">Design and Testing Methodology</a></li>
+  <li><a href="#technical-documentations" id="toc-technical-documentations" class="nav-link" data-scroll-target="#technical-documentations">Technical Documentations</a></li>
+  <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion">Results and Discussion</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#ai-prototype-summary" id="toc-ai-prototype-summary" class="nav-link" data-scroll-target="#ai-prototype-summary">AI Prototype Summary</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -159,8 +174,172 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<section id="lab-4-digital-audio" class="level2">
+<h2 class="anchored" data-anchor-id="lab-4-digital-audio">Lab 4 : Digital Audio</h2>
+<section id="introduction" class="level3">
+<h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
+<p>In this lab, I used an MCU to play music by using timers to generate square waves (toggling a GPIO pin at a specific frequency for specified durations). I was able to sucessfully play “Fur Elise” by Ludwig van Beethoven, “I Will Survive” by Gloria Gaynor, and “Beauty And A Beat” by Justin Bieber and Nicki Minaj.</p>
+</section>
+<section id="project-details" class="level3">
+<h3 class="anchored" data-anchor-id="project-details">Project Details</h3>
+</section>
+<section id="design-and-testing-methodology" class="level3">
+<h3 class="anchored" data-anchor-id="design-and-testing-methodology">Design and Testing Methodology</h3>
+<section id="choosing-a-prescaler-value" class="level4">
+<h4 class="anchored" data-anchor-id="choosing-a-prescaler-value">Choosing a Prescaler Value</h4>
+<p>Prescaler has to be set to 1, 2, 4, 8, 16 as the division factor.</p>
+<p>Pitch needs to calculated across the frequency range 220 - 1000 Hz. If you do 1/f you get seconds which finds wavelengths at a range between 1 ms to 4.55 ms.</p>
+<p>The prescaler divides your counter clock frequency by any factor between 1 tick and 65536 (2^16) ticks because we have a 16 bit PSC register that we can set.</p>
+<p>We calculate how long a tick takes by dividing the ms/tick to get ms per tick. We don’t want to do 1 ms / 1 tick because then that would mean the frequency corresponding to 4.55 ms would be either 4 ticks or 5 ticks which would cause a big error margin off of 1%. So we set this with the most amount of ticks we can which is 4.55 ms / 2^16 ticks -&gt; 0.00006943 ms/ticks.</p>
+<p>In terms of the PSC we can see on the clock tree that there are a couple of PSCs that we can set. There’s a PSC for AHB coming from the SysCLK and APB1 and APB2. I believe because of the reset value the default is just being disabled/or set to 1 which doesn’t change anything for us. This is different PSCs than the ones that we can set internally on the timers at their PSC registers.</p>
+<p>That can be set to anything I think but to be safe, I set it to be a multiple of 2, in this case 8.</p>
+<p>That means that it would take my 80 MHz clock from the PLL file and divide by 8 to get a 10 Mhz frequency. You can then use that and the equation: f_clkpsc / PSC[15:0] + 1 to solve for the new ms per tick. But I did a slightly different way where I took that 10 MHz signal and did 1/10*10^6 which gets 0.0001 ms per tick as the rate I’m ticking at.</p>
+<p>To check that this is within 1% I check with a random frequency, let’s say 622.2 Hz so I convert that into milliseconds to get 1.6072… I then take that number and divide by my 0.0001 ms / tick to get ms/ (ms/ticks) = ticks -&gt; This is 16,072.00257 ticks. The whole point is that the PSC counter can only do whole numbers so to get the 622.2 Hz frequency it would count to either 16,072 ticks or 16,073 ticks. (16,073 ticks has the larger error margin so I continued with that)</p>
+<p>Then I convert this back using the steps above in opposite direction to get 622.16 which I do abs((622.2 - 622.16) / 622.2) * 100 to get an error of 0.0006 % which is less than 1 % so we are good.</p>
+</section>
+</section>
+<section id="technical-documentations" class="level3">
+<h3 class="anchored" data-anchor-id="technical-documentations">Technical Documentations</h3>
+<p>All the code for the project can be found in the following <a href="https://github.com/caiyacoggshall7/e155-lab4">Github repository.</a></p>
+<section id="schematic" class="level4">
+<h4 class="anchored" data-anchor-id="schematic">Schematic</h4>
+<p>I followed a circuit as found on Figure 9 of the datasheet for a LM386 Low Voltage Power Amplifier. My own drawn schematic can be found in the figure below:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1484.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 1: Current Calculations</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="results-and-discussion" class="level3">
+<h3 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h3>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+</section>
+<section id="ai-prototype-summary" class="level3">
+<h3 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h3>
+<p>I used ChatGPT 5 Pro to answer the following prompt:</p>
+<pre><code>" What timers should I use on the STM32L432KC to generate frequencies ranging from 220Hz to 1kHz? What’s the best choice of timer if I want to easily connect it to a GPIO pin? What formulae are relevant, and what registers need to be set to configure them properly? "</code></pre>
+<p>It produced the following response:</p>
+<p>``` Plan of attack (brief): pick a timer that can drive a pin directly, decide how you’ll clock it, then set prescaler (PSC) and auto‑reload (ARR) so the update rate lands in 220 Hz–1 kHz. Use PWM mode for a clean 50 % square wave (or any duty), and route the channel to a convenient GPIO with the right Alternate Function (AF). Finally, enable the channel and (for TIM1 only) its main output.</p>
+<p>Which timer on STM32L432KC?</p>
+<p>For a simple, accurate square wave on a GPIO, use a timer that has output‑compare/PWM channels and has those channels pinned out in the 32‑pin package:</p>
+<p>TIM2 (general‑purpose, 32‑bit) — simplest choice; four channels on easily available pins:</p>
+<p>PA0/PA1/PA2/PA3 ⇒ TIM2_CH1/CH2/CH3/CH4 (AF1); PA15 (CH1) and PB3 (CH2) are also options. STMicroelectronics</p>
+<p>TIM1 (advanced, 16‑bit) — also fine; four channels on:</p>
+<p>PA8/PA9/PA10/PA11 ⇒ TIM1_CH1/CH2/CH3/CH4 (AF1). Note TIM1 needs BDTR.MOE=1 to drive pins. STMicroelectronics</p>
+<p>TIM15/16/17 exist but have fewer channels; they work too if those specific pins suit your layout. (See AF tables in the datasheet.) STMicroelectronics</p>
+<p>Avoid basic timers (TIM6/TIM7) for this—they have no output pins (useful only for timebases/interrupts). For ultra‑low‑power or Stop‑mode output you can use LPTIM1 (and LPTIM2 is also present), but the default LPTIM1 output is on PA14 (SWCLK), which collides with the debugger—fine in production, awkward while debugging. STMicroelectronics +1</p>
+<p>Bottom line: If you want the easiest path to a GPIO today, pick TIM2 (e.g., CH1 on PA0) or TIM1 (CH1 on PA8). Both channels are clearly pinned in the L432KC datasheet’s AF tables. STMicroelectronics</p>
+<p>What gets you the right frequency?</p>
+<p>Let</p>
+<p>𝑓 tim f tim ​</p>
+<p>= timer input clock (derived from APB bus),</p>
+<p>𝑃 𝑆 𝐶 PSC = prescaler register value,</p>
+<p>𝐴 𝑅 𝑅 ARR = auto‑reload register value (period),</p>
+<p>𝐶 𝐶 𝑅 𝑥 CCR x ​</p>
+<p>= compare (duty) for channel 𝑥 x.</p>
+<p>Key facts:</p>
+<p>Timer counter clock after prescaler</p>
+<p>𝑓 cnt = 𝑓 tim 𝑃 𝑆 𝐶 + 1 f cnt ​</p>
+<p>= PSC+1 f tim ​</p>
+<pre><code>​</code></pre>
+<p>PWM (edge‑aligned) / update frequency</p>
+<p>𝑓 out = 𝑓 cnt 𝐴 𝑅 𝑅 + 1 = 𝑓 tim ( 𝑃 𝑆 𝐶 + 1 ) ( 𝐴 𝑅 𝑅 + 1 ) f out ​</p>
+<p>= ARR+1 f cnt ​</p>
+<pre><code>​</code></pre>
+<p>= (PSC+1)(ARR+1) f tim ​</p>
+<pre><code>​</code></pre>
+<p>Duty cycle on channel 𝑥 x</p>
+<p>=&nbsp;( CCR_x=\text{ for ≈50 %})</p>
+<p>ST’s timer docs (and wiki) use exactly these relations. STMicroelectronics Wiki</p>
+<p>Where does 𝑓 tim f tim ​</p>
+<p>come from? From the APB clock with the usual STM32 quirk:</p>
+<p>If APB prescaler = 1: 𝑓 tim = 𝑓 APB f tim ​</p>
+<p>=f APB ​</p>
+<p>.</p>
+<p>If APB prescaler &gt; 1: timer clock is 2× APB (timers get an extra x2). This is in the ST docs and FAQs; double‑check your RCC setup. STMicroelectronics Wiki +1</p>
+<p>On the L432, a very common setup is SystemCoreClock = 80 MHz with APB prescalers = 1 ⇒ 𝑓 tim = 80  MHz f tim ​</p>
+<p>=80 MHz for TIM1/TIM2.</p>
+<p>One‑setting trick for your whole 220–1000 Hz range</p>
+<p>Fix the prescaler so the counter ticks at 1 MHz (easy math), then vary ARR:</p>
+<p>Set PSC = 79 → 𝑓 cnt = 80   MHz / ( 79 + 1 ) = 1   MHz f cnt ​</p>
+<p>=80MHz/(79+1)=1MHz.</p>
+<p>Then ARR = round(1,000,000 / f_{}) − 1.</p>
+<p>Examples (all ≈50 % duty with CCR = (ARR+1)/2):</p>
+<p>Target f (Hz) ARR+1 (rounded) ARR CCR (≈50 %) Resulting f 1000 1000 999 500 exactly 1.000 kHz 880 1136 1135 568 1 000 000/1136 ≈ 880.28 Hz 440 2273 2272 1136 1 000 000/2273 ≈ 440.04 Hz 220 4545 4544 2272 or 2273 1 000 000/4545 ≈ 220.02 Hz</p>
+<p>The errors are ≤0.03 %, dominated by integer rounding—well below typical RC oscillator drift unless you clock the timer from a crystal‑disciplined source. (Formulas per ST’s timer docs.) STMicroelectronics Wiki</p>
+<p>Registers to touch (TIM2 example on PA0 = TIM2_CH1)</p>
+<p>Pin mux (datasheet AF table shows AF1): set PA0 to AF1. STMicroelectronics</p>
+<p>Enable clocks</p>
+<p>RCC-&gt;AHB2ENR |= RCC_AHB2ENR_GPIOAEN; (GPIOA)</p>
+<p>RCC-&gt;APB1ENR1 |= RCC_APB1ENR1_TIM2EN; (TIM2) (These bit names are standard for the L4 family; see ST headers/reference.) ST Community</p>
+<p>GPIO alternate function (AF1 on PA0)</p>
+<p>GPIOA-&gt;MODER → set PA0 to 10b (Alternate).</p>
+<p>GPIOA-&gt;AFR[0] → set PA0 AF to 1 (TIM2/AF1 per datasheet). STMicroelectronics</p>
+<p>Timer base</p>
+<p>TIM2-&gt;PSC = 79; // 1 MHz tick at 80 MHz timer clock</p>
+<p>TIM2-&gt;ARR = 999; // 1 kHz to start</p>
+<p>TIM2-&gt;CR1 |= TIM_CR1_ARPE; // preload ARR (safer updates)</p>
+<p>TIM2-&gt;EGR = TIM_EGR_UG; // generate update to latch PSC/ARR</p>
+<p>PWM channel setup (edge‑aligned PWM mode 1)</p>
+<p>In CCMR1 (output mode):</p>
+<p>Select PWM mode 1 on CH1: OC1M = 110b.</p>
+<p>Enable preload: OC1PE = 1.</p>
+<p>Duty: TIM2-&gt;CCR1 = (TIM2-&gt;ARR + 1)/2; // ≈50 %</p>
+<p>Polarity &amp; enable in CCER:</p>
+<p>CC1P = 0 (active high), CC1E = 1.</p>
+<p>Start</p>
+<p>TIM2-&gt;CR1 |= TIM_CR1_CEN;</p>
+<p>These steps mirror ST’s PWM configuration guidance: pick PWM mode in CCMRx, program ARR/CCR, enable preload (CCMRx/CR1), enable output in CCER, then enable the counter and generate an update. STMicroelectronics</p>
+<p>TIM1 differences: identical sequence, but also set TIM1-&gt;BDTR |= TIM_BDTR_MOE; to enable the main outputs (advanced timer requirement). STMicroelectronics</p>
+<p>If you prefer LPTIM1 (low‑power or Stop‑mode operation)</p>
+<p>LPTIM can generate PWM with ARR = period and CMP = pulse width, even in Stop mode if clocked appropriately. Relevant control bits are in LPTIM_CFGR (prescaler, waveform polarity, preload) and LPTIM_CR (enable/start). The output is LPTIM_OUT (on PA14 for L432KC, per AF table). STMicroelectronics +1</p>
+<p>Clock: pick a kernel clock in RCC-&gt;CCIPR.LPTIM1SEL (APB/LSI/HSI16/LSE on L4). Using HSI16 and PRESC=16 again gives a 1 MHz tick → same ARR=round(1e6/f)-1 math. (See ST RCC/LPTIM training; CCIPR selection documented for L4.) STMicroelectronics</p>
+<p>Formula (PWM): 𝑓 out = 𝑓 lptim PRESC ⋅ ( 𝐴 𝑅 𝑅 + 1 ) f out ​</p>
+<p>= PRESC⋅(ARR+1) f lptim ​</p>
+<pre><code>​</code></pre>
+<p>, duty via 𝐶 𝑀 𝑃 / ( 𝐴 𝑅 𝑅 + 1 ) CMP/(ARR+1). Preload behavior (update now vs end‑of‑period) is controlled by CFGR.PRELOAD; flags ARROK/CMPOK indicate safe updates. STMicroelectronics</p>
+<p>Heads‑up: PA14 is the SWD clock pin; you’ll lose the debugger if you repurpose it unless you remap/reset debug. For bring‑up and debugging, TIM2/TIM1 pins (above) are friendlier. STMicroelectronics</p>
+<p>Summarized formulae you’ll use</p>
+<p>Timer counter clock: 𝑓 cnt = 𝑓 tim / ( 𝑃 𝑆 𝐶 + 1 ) f cnt ​</p>
+<p>=f tim ​</p>
+<p>/(PSC+1) (with the x2 APB rule when APB prescaler &gt; 1). STMicroelectronics Wiki +1</p>
+<p>Output/PWM frequency: 𝑓 out = 𝑓 tim / ( ( 𝑃 𝑆 𝐶 + 1 ) ( 𝐴 𝑅 𝑅 + 1 ) ) f out ​</p>
+<p>=f tim ​</p>
+<p>/((PSC+1)(ARR+1)). STMicroelectronics Wiki</p>
+<p>Duty: 𝐶 𝐶 𝑅 = duty × ( 𝐴 𝑅 𝑅 + 1 ) CCR=duty×(ARR+1). STMicroelectronics Wiki</p>
+<p>Minimal, register‑level snippet (TIM2 → PA0, 1 kHz @ 50 %) // Clocks RCC-&gt;AHB2ENR |= RCC_AHB2ENR_GPIOAEN; // GPIOA RCC-&gt;APB1ENR1 |= RCC_APB1ENR1_TIM2EN; // TIM2</p>
+<p>// PA0 = AF1 (TIM2_CH1) GPIOA-&gt;MODER &amp;= ~(3u &lt;&lt; (0<em>2)); GPIOA-&gt;MODER |= (2u &lt;&lt; (0</em>2)); // Alternate GPIOA-&gt;AFR[0] &amp;= ~(0xFu &lt;&lt; (0<em>4)); GPIOA-&gt;AFR[0] |= (0x1u &lt;&lt; (0</em>4)); // AF1</p>
+<p>// Time base to 1 MHz, then 1 kHz PWM TIM2-&gt;PSC = 79; // 80 MHz / 80 = 1 MHz TIM2-&gt;ARR = 999; // 1 MHz / (999+1) = 1 kHz TIM2-&gt;CCR1 = 500; // ≈50 % duty</p>
+<p>// PWM mode 1 on CH1, preload TIM2-&gt;CCMR1 &amp;= ~(7u &lt;&lt; 4); TIM2-&gt;CCMR1 |= (6u &lt;&lt; 4) | (1u &lt;&lt; 3); // OC1M=110 (PWM1), OC1PE=1 TIM2-&gt;CCER &amp;= ~(1u &lt;&lt; 1); // CC1P=0 (active high) TIM2-&gt;CCER |= (1u &lt;&lt; 0); // CC1E=1 (enable output)</p>
+<p>TIM2-&gt;CR1 |= (1u &lt;&lt; 7); // ARPE=1 TIM2-&gt;EGR = (1u &lt;&lt; 0); // UG: latch PSC/ARR/CCR TIM2-&gt;CR1 |= (1u &lt;&lt; 0); // CEN=1: go</p>
+<p>To retune frequency anywhere from 220 Hz to 1 kHz, keep PSC=79 and update only:</p>
+<p>TIM2-&gt;ARR = (uint32_t)( (1000000u + f/2) / f ) - 1; // rounded TIM2-&gt;CCR1 = (TIM2-&gt;ARR + 1) / 2; // 50% duty TIM2-&gt;EGR = TIM_EGR_UG; // latch safely</p>
+<p>(Exact bitfields and sequencing correspond to ST’s timer PWM guidance.) STMicroelectronics</p>
+<p>Pin choices you can wire quickly</p>
+<p>From the L432KC datasheet AF tables:</p>
+<p>TIM2 PWM pins you likely have on headers: PA0/PA1/PA2/PA3 (AF1); also PA15 (AF1) and PB3 (AF1) if you’re not using JTAG/SWO. STMicroelectronics</p>
+<p>TIM1 PWM pins: PA8/PA9/PA10/PA11 (AF1). STMicroelectronics</p>
+<p>LPTIM1_OUT: PA14, AF listed in the same table; beware SWCLK. STMicroelectronics</p>
+<p>Practical tips</p>
+<p>Enable preload (OCxPE and ARPE) and write EGR.UG after changing PSC/ARR/CCR to avoid mid‑cycle glitches. ST’s app note describes this PWM configuration sequence. STMicroelectronics</p>
+<p>If APB prescaler ≠ 1, remember the x2 timer clock rule—it will otherwise double your expected frequency. ST Community</p>
+<p>For TIM1 outputs, don’t forget BDTR.MOE=1. STMicroelectronics</p>
+<p>For Stop‑mode waveform generation with lowest power, prefer LPTIM and program ARR/CMP in Continuous mode; its CFGR/CR and preload/ARROK/CMPOK behavior are detailed in ST’s LPTIM app note. STMicroelectronics</p>
+<p>References</p>
+<p>STM32L432KC datasheet — pin/AF mapping showing TIM1/TIM2/LPTIM functions on PA0–PA3, PA8–PA12, PA14, PA15, PB3… (Tables “AF0–AF7” &amp; “AF8–AF15”). STMicroelectronics</p>
+<p>ST wiki (Getting started with TIM) — prescaler and period formulas; config concepts. STMicroelectronics Wiki</p>
+<p>AN4013 (ST app note) — step‑by‑step PWM mode configuration (CCMRx, CCER, ARR/CCR, ARPE, etc.). STMicroelectronics</p>
+<p>AN4865 (LPTIM) — PWM via LPTIM (ARR period, CMP duty, CFGR.PRELOAD, WAVE/WAVEPOL, ARROK/CMPOK), clocking from APB/LSI/HSI/LSE, Stop‑mode behavior. STMicroelectronics</p>
+<p>ST community notes — APB prescaler “×2 timer clock” rule reminders. ST Community</p>
+<p>If you’d like, I can tailor a pin‑accurate snippet for your exact board headers (e.g., Nucleo‑32 D‑pins) or add a small helper to compute ARR for arbitrary pitches (e.g., musical A3 = 220 Hz up to 1 kHz). ```</p>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
