@@ -197,6 +197,10 @@ ul.task-list li input[type="checkbox"] {
 <p>To check that this is within 1% I check with a random frequency, let’s say 622.2 Hz so I convert that into milliseconds to get 1.6072… I then take that number and divide by my 0.0001 ms / tick to get ms/ (ms/ticks) = ticks -&gt; This is 16,072.00257 ticks. The whole point is that the PSC counter can only do whole numbers so to get the 622.2 Hz frequency it would count to either 16,072 ticks or 16,073 ticks. (16,073 ticks has the larger error margin so I continued with that)</p>
 <p>Then I convert this back using the steps above in opposite direction to get 622.16 which I do abs((622.2 - 622.16) / 622.2) * 100 to get an error of 0.0006 % which is less than 1 % so we are good.</p>
 </section>
+<section id="calculations-for-minimum-and-maximum-frequencyduration" class="level4">
+<h4 class="anchored" data-anchor-id="calculations-for-minimum-and-maximum-frequencyduration">Calculations for Minimum and Maximum Frequency/Duration</h4>
+<p>!(images/IMG_1614.jpg) !(images/IMG_1615.jpg) !(images/IMG_1616.jpg) !(images/IMG_1617.jpg) !(images/IMG_1618.jpg) !(images/IMG_1619.jpg)</p>
+</section>
 </section>
 <section id="technical-documentations" class="level3">
 <h3 class="anchored" data-anchor-id="technical-documentations">Technical Documentations</h3>
@@ -206,8 +210,8 @@ ul.task-list li input[type="checkbox"] {
 <p>I followed a circuit as found on Figure 9 of the datasheet for a LM386 Low Voltage Power Amplifier. My own drawn schematic can be found in the figure below:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/IMG_1484.jpg" class="img-fluid figure-img"></p>
-<figcaption>Figure 1: Current Calculations</figcaption>
+<p><img src="images/IMG_1613.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 7: Schematic for Board Layout</figcaption>
 </figure>
 </div>
 </section>
@@ -217,6 +221,8 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="conclusion" class="level3">
 <h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>Total Time: ~ 40 hours</p>
+<p>This lab wasn’t the most difficult so far but there was a small learning curve to getting reaquainted with C programming and a lot of small software bugs along the way ended up taking a lot of time to figure out. Overall a very fun lab to encode for!</p>
 </section>
 <section id="ai-prototype-summary" class="level3">
 <h3 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h3>
@@ -336,6 +342,8 @@ ul.task-list li input[type="checkbox"] {
 <p>AN4865 (LPTIM) — PWM via LPTIM (ARR period, CMP duty, CFGR.PRELOAD, WAVE/WAVEPOL, ARROK/CMPOK), clocking from APB/LSI/HSI/LSE, Stop‑mode behavior. STMicroelectronics</p>
 <p>ST community notes — APB prescaler “×2 timer clock” rule reminders. ST Community</p>
 <p>If you’d like, I can tailor a pin‑accurate snippet for your exact board headers (e.g., Nucleo‑32 D‑pins) or add a small helper to compute ARR for arbitrary pitches (e.g., musical A3 = 220 Hz up to 1 kHz). ```</p>
+<p>Some of the equations didn’t show up but my main take away from it’s advice was that it reccommended using a simpler timer such as TIM2 or TIM1. It optionally said TIM15/TIm16 which I used but it wrote it off for have too few channels.</p>
+<p>It also said to make the prescaler the same value as the clock which I think would have played it too slow. It had good practical tips on how to debug/what registers to code which I appreciated.</p>
 
 
 </section>
