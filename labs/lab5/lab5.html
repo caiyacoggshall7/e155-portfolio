@@ -244,7 +244,7 @@ ul.task-list li input[type="checkbox"] {
 <section id="results-and-discussion" class="level3">
 <h3 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h3>
 <p>The working motor at 12 V can be seen on video here:</p>
-<div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="IMG_1622.mov"></video></div>
+<div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="IMG_1622.MOV"></video></div>
 </section>
 <section id="conclusion" class="level3">
 <h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
@@ -252,6 +252,7 @@ ul.task-list li input[type="checkbox"] {
 <p>Total time: 14 hours</p>
 <p>There were a few bugs that came along the way. The motor was rated for 0V to 12 V but it also needed to hold for voltage up to 20V on the power supply. However, when it was cranked up the velocity computation would freeze at 3 rev/sec.&nbsp;This was because the interrupt code was taking too long to run. At the time I had 4 different if/else if statements for all the different cases I could see (think truth table), i.e when A is 1 and B is 0 and so on. I tried compressing a few ways until eventually I had a single if statement checking if A == B and then an else statement!</p>
 <p>Also, the starter code selected the pins as pull ups but it needed to be pull downs in order for the motor to run!</p>
+<p>Lastly, I had set my counter to be a uint32_t which meant that it was unsigned and thus recorded as a 2’s complement number. But it was being read as a signed integer so it produced extremely large revolution numbers which wasn’t accurate!</p>
 </section>
 <section id="ai-prototype-summary" class="level3">
 <h3 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h3>

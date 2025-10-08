@@ -201,7 +201,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="calculations-for-minimum-and-maximum-frequencyduration" class="level4">
 <h4 class="anchored" data-anchor-id="calculations-for-minimum-and-maximum-frequencyduration">Calculations for Minimum and Maximum Frequency/Duration</h4>
-<p>!(images/IMG_1614.jpg) !(images/IMG_1615.jpg) !(images/IMG_1616.jpg) !(images/IMG_1617.jpg) !(images/IMG_1618.jpg) !(images/IMG_1619.jpg)</p>
+<p><img src="images/IMG_1614.jpg" class="img-fluid"> <img src="images/IMG_1615.jpg" class="img-fluid"> <img src="images/IMG_1616.jpg" class="img-fluid"> <img src="images/IMG_1617.jpg" class="img-fluid"> <img src="images/IMG_1618.jpg" class="img-fluid"> <img src="images/IMG_1619.jpg" class="img-fluid"></p>
 </section>
 </section>
 <section id="technical-documentations" class="level3">
@@ -220,13 +220,19 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="results-and-discussion" class="level3">
 <h3 class="anchored" data-anchor-id="results-and-discussion">Results and Discussion</h3>
-<p>I met all specifications for this lab. There were a number of errors that came up. One of the biggest ones was</p>
-<p>Here’s a video of the working Fur Elise Composition: </p><div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="IMG_1610.mov"></video></div><p></p>
+<p>I met all specifications for this lab. There were a number of errors that came up. One of the biggest ones.</p>
+<p>Here’s a video of the working Fur Elise Composition: </p><div class="quarto-video"><video id="video_shortcode_videojs_video2" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="IMG_1610.MOV"></video></div><p></p>
 </section>
 <section id="conclusion" class="level3">
 <h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
 <p>Total Time: ~ 40 hours</p>
 <p>This lab wasn’t the most difficult so far but there was a small learning curve to getting reaquainted with C programming and a lot of small software bugs along the way ended up taking a lot of time to figure out. Overall a very fun lab to encode for!</p>
+<p>The bugs were seprated between software and hardware. Hardware was easier to debug for, often it was a variation of buzzing through the speaker that could be solved by putting a capacitor between power and ground. Additionally, since I pluggged directly into the MCU opposed to the motherboard the pin names were not the same and that was something I figured out a little later. Additionally as I was testing, I had routed 5V from the power supply and grounded via my MCU. This is an electrical fundamental that I didn’t even realise! I needed to ground and power from the same supply to create a complete and consistent common point for the electrical signals, where I likely had a floating voltage before.</p>
+<p>The software bugs were a little harder to solve for because often I would be writing to the right registers and have all the puzzle pieces but they weren’t put together correctly.</p>
+<p>At first nothing even played! I forget the exact fix but it involved a lot of Build and Debug stepping through. After that the notes weren’t being delayed and so the speaker didn’t play but I did get a square wave with the right frequencies on the oscilloscope. I believe this was a but in outputPWM where I calculated my ARR value to be ((1/hz)<em>1000</em>TICKSPERMS). I luckily already had an if statement for when hz = 0 but when I did 1/hz first it would create such a small number that it would round down to 0 and never delay any of the notes.</p>
+<p>The bug that I arguably spent the most time on was when my first note of any song would hold for 7 seconds (I counted!) and some of the delays would bleed into each other. It made the melody very fun to listen to but ultimately wrong:</p>
+<div class="quarto-video"><video id="video_shortcode_videojs_video1" class="video-js vjs-default-skin vjs-fluid" controls="" preload="auto" data-setup="{}" title=""><source src="IMG_1608.MOV"></video></div>
+<p>The fix here was om delay_millis(). I would setup my counter (CNT = 0) right before my while loop where it waited for my UIF flag to trigger. But when stepping through, the CNT would be larger than the ARR and sometimes the UIF flag would still be low. Part of this was I didn’t reinitialize the counter by setting the UG bit. But as soon as I would do that, the speaker wouldn’t play anything. So this involved some shuffling of line order. I first reloaded the register, set the status register to count, updated the UIF flag to go high when CNT &gt; ARR, set up counter, and THEN set the UG big and cleared it in software (in status register) IMMEDIATELY and then when into the while loop. Which did a hard reset in software so the CNT was 0 when starting in the while loop.</p>
 </section>
 <section id="ai-prototype-summary" class="level3">
 <h3 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h3>
@@ -755,6 +761,7 @@ ul.task-list li input[type="checkbox"] {
   </script>
 </div> <!-- /content -->
 <script>videojs(video_shortcode_videojs_video1);</script>
+<script>videojs(video_shortcode_videojs_video2);</script>
 
 
 
