@@ -181,6 +181,7 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="lab-6-internet-of-things-and-serial-peripheral-interface">Lab 6 : Internet of Things and Serial Peripheral Interface</h2>
 <section id="introduction" class="level3">
 <h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
+<p>In this lab we were asked to design and implement SPI functionality of the MCU to then interface with a digital temperature sensor module. Additionally we wrote a simple HTML page to control and display data from the peripherals connected to the MCU.</p>
 <p>This is what the webpage looked like: <img src="images/website.png" class="img-fluid" alt="Figure 1: Webpage"></p>
 <p>It was accessible after connecting to the WiFi access point specific to my ESP8266 board and then going to “http://192.168.4.1/”. It could often work rather slowly and take a few presses to set the resolution but it worked!</p>
 </section>
@@ -202,15 +203,17 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 <p>As seen in the trace, the MOSI MISO lines get the right hex numbers they were expecting. This was the trace seen after requesting 8-bit resolution. So the address 0x80 was sent to configure followed by the 0xE0 address for 8 bit resolution. Then it’s followed by dummy bits and the values at addresses 0x02 and 0x01 for the MSB and LSB bits respectively.</p>
+<p>This was quite hard to set up on the oscilloscope and I watched the tutorial video 3 times over before I got it. A frustrating feature was that the MISO/MOSI values would change with horizhontal scaling or just between traces. A couple hypotheses is that if the LED is on then those addresses are interferring because the LED turns off automatically when setting a resolution. Another is that scaling affects resolution and accuracy of the trace which would reasonably translate to what it’s able to capture.</p>
 </section>
 <section id="code" class="level3">
 <h3 class="anchored" data-anchor-id="code">Code</h3>
 <p>All the code for the project can be found in the following <a href="https://github.com/caiyacoggshall7/e155-lab6">Github repository.</a></p>
+<p>The code should contain relevant datasheets and comments relating to the code.</p>
 </section>
 <section id="conclusion" class="level3">
 <h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
 <p>Time Spent: 34 - 38 hours</p>
-<p>I ended up facing quite a few bugs in the process of this lab which mean a lot of commenting out. At first my SPI didn’t work and then my configuretemp() function didn’t work and then all of my resolution didn’t work.</p>
+<p>I ended up facing quite a few bugs in the process of this lab which mean a lot of commenting out. At first my SPI didn’t work and then my configuretemp() function didn’t work and then all of my resolution didn’t work because I wasn’t converting the request into a readable form for my setresolution() function.</p>
 <p>There was a very frustrating bug that said “10 bytes of fewer received on MCU” that seemed to haunt me.</p>
 <p>I also had a very odd bug where my updateTemp function would return the right resolution number and then on the same request return “-1” right after that. I had to creatively fix that bug but was not able to determine the root cause of it.</p>
 </section>
