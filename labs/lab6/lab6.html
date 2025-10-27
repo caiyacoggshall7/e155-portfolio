@@ -154,8 +154,21 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#lab-6-internet-of-things-and-serial-peripheral-interface" id="toc-lab-6-internet-of-things-and-serial-peripheral-interface" class="nav-link active" data-scroll-target="#lab-6-internet-of-things-and-serial-peripheral-interface">Lab 6 : Internet of Things and Serial Peripheral Interface</a>
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#schematic" id="toc-schematic" class="nav-link" data-scroll-target="#schematic">Schematic</a></li>
+  <li><a href="#logic-analyzer" id="toc-logic-analyzer" class="nav-link" data-scroll-target="#logic-analyzer">Logic Analyzer</a></li>
+  <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">Code</a></li>
+  <li><a href="#ai-prototype" id="toc-ai-prototype" class="nav-link" data-scroll-target="#ai-prototype">AI Prototype</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
@@ -163,8 +176,102 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+<section id="lab-6-internet-of-things-and-serial-peripheral-interface" class="level2">
+<h2 class="anchored" data-anchor-id="lab-6-internet-of-things-and-serial-peripheral-interface">Lab 6 : Internet of Things and Serial Peripheral Interface</h2>
+<section id="introduction" class="level3">
+<h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
+</section>
+<section id="schematic" class="level3">
+<h3 class="anchored" data-anchor-id="schematic">Schematic</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1728.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 1: Schematic of Digital Thermometer</figcaption>
+</figure>
+</div>
+</section>
+<section id="logic-analyzer" class="level3">
+<h3 class="anchored" data-anchor-id="logic-analyzer">Logic Analyzer</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/logic.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 2: Oscilloscope Trace of Logic Analyzer</figcaption>
+</figure>
+</div>
+</section>
+<section id="code" class="level3">
+<h3 class="anchored" data-anchor-id="code">Code</h3>
+<p>All the code for the project can be found in the following <a href="https://github.com/caiyacoggshall7/e155-lab6">Github repository.</a></p>
+</section>
+<section id="ai-prototype" class="level3">
+<h3 class="anchored" data-anchor-id="ai-prototype">AI Prototype</h3>
+<p>I used Chat GPT 5 Pro to come up with the code for the following prompt:</p>
+<pre><code>I’m making a web portal to interface with a temperature sensor. Create a HTML page that looks good and is intuitive to show the temperature, control an LED, and change the precision of the readout.
+
+Write me a C function to carry out a SPI transaction to retrieve a temperature reading from a DS1722 sensor. Make use of CMSIS libraries for the STM32L432KC.</code></pre>
+<p>It gave me:</p>
+<p>// ds1722_stm32l432.c // CMSIS-only (no HAL). Tested layout assumes SPI1 on PA5/PA6/PA7 and CE on PA4.</p>
+<p>#include “stm32l432xx.h” #include &lt;stdint.h&gt;</p>
+<p>#define DS1722_CE_GPIO GPIOA #define DS1722_CE_PIN 4U // PA4 used as CE (active HIGH per DS1722) #define DS1722_SPI SPI1</p>
+<p>// —– CE helpers (active HIGH) —– static inline void ds1722_ce_high(void) { DS1722_CE_GPIO-&gt;BSRR = (1U &lt;&lt; DS1722_CE_PIN); } static inline void ds1722_ce_low (void) { DS1722_CE_GPIO-&gt;BRR = (1U &lt;&lt; DS1722_CE_PIN); }</p>
+<p>// —– 8-bit full-duplex transfer on SPI1 —– static inline uint8_t spi1_txrx(uint8_t tx) { // Wait until TX buffer empty while ((DS1722_SPI-&gt;SR &amp; SPI_SR_TXE) == 0) { /* spin <em>/ } </em>(__IO uint8_t *)&amp;DS1722_SPI-&gt;DR = tx; // 8-bit write</p>
+<pre><code>// Wait until a byte is received
+while ((DS1722_SPI-&gt;SR &amp; SPI_SR_RXNE) == 0) { /* spin */ }
+return *(__IO uint8_t *)&amp;DS1722_SPI-&gt;DR;          // 8-bit read</code></pre>
+<p>}</p>
+<p>// —– Minimal SPI1 + GPIO init (CPHA=1, CPOL=0, 8-bit) —– void DS1722_SPI1_Init(void) { // Clocks RCC-&gt;AHB2ENR |= RCC_AHB2ENR_GPIOAEN; RCC-&gt;APB2ENR |= RCC_APB2ENR_SPI1EN;</p>
+<pre><code>// PA5=SCK, PA6=MISO, PA7=MOSI -&gt; AF5
+GPIOA-&gt;MODER  &amp;= ~((3U&lt;&lt;(5*2)) | (3U&lt;&lt;(6*2)) | (3U&lt;&lt;(7*2)));
+GPIOA-&gt;MODER  |=  ((2U&lt;&lt;(5*2)) | (2U&lt;&lt;(6*2)) | (2U&lt;&lt;(7*2)));
+GPIOA-&gt;AFR[0] &amp;= ~((0xF&lt;&lt;(5*4)) | (0xF&lt;&lt;(6*4)) | (0xF&lt;&lt;(7*4)));
+GPIOA-&gt;AFR[0] |=  ((5U&lt;&lt;(5*4)) | (5U&lt;&lt;(6*4)) | (5U&lt;&lt;(7*4)));
+GPIOA-&gt;OSPEEDR|=  ((2U&lt;&lt;(5*2)) | (2U&lt;&lt;(6*2)) | (2U&lt;&lt;(7*2)));   // medium/high
+GPIOA-&gt;PUPDR  &amp;= ~((3U&lt;&lt;(5*2)) | (3U&lt;&lt;(6*2)) | (3U&lt;&lt;(7*2)));   // no pulls
+
+// PA4 as CE (GPIO out), idle LOW
+GPIOA-&gt;MODER  &amp;= ~(3U&lt;&lt;(DS1722_CE_PIN*2));
+GPIOA-&gt;MODER  |=  (1U&lt;&lt;(DS1722_CE_PIN*2));                    // output
+ds1722_ce_low();
+
+// Disable SPI while configuring
+DS1722_SPI-&gt;CR1 = 0;
+DS1722_SPI-&gt;CR2 = 0;
+
+// Data size = 8-bit, RXNE flag at 8-bit threshold
+DS1722_SPI-&gt;CR2 = (7U &lt;&lt; SPI_CR2_DS_Pos) | SPI_CR2_FRXTH;
+
+// Master, CPOL=0, CPHA=1 (required by DS1722), SW-NSS, prescaler fPCLK/32
+DS1722_SPI-&gt;CR1 =
+    SPI_CR1_MSTR |
+    SPI_CR1_SSM  | SPI_CR1_SSI |
+    SPI_CR1_CPHA |             // CPHA must be 1
+    (4U &lt;&lt; SPI_CR1_BR_Pos);    // BR=100: /32 (safe; sensor is slow)
+
+// Enable SPI
+DS1722_SPI-&gt;CR1 |= SPI_CR1_SPE;</code></pre>
+<p>}</p>
+<p>// —– (Optional) Put DS1722 in continuous 12-bit mode (SD=0, R2=1) —– void DS1722_Start_12bit_Continuous(void) { // Write configuration register @ 0x80 with value 0xE8: // 1110 1000 -&gt; [1][1][1][1SHOT=0][R2=1][R1=0][R0=0][SD=0] ds1722_ce_high(); (void)spi1_txrx(0x80); // write address for CONFIG (void)spi1_txrx(0xE8); // config value: 12-bit, continuous // Wait for last bit out while (DS1722_SPI-&gt;SR &amp; SPI_SR_BSY) { /* spin */ } ds1722_ce_low(); }</p>
+<p>// —– READ: returns temperature in °C (blocking, burst read of 2 bytes) —– float DS1722_Read_Temperature_C(void) { // Burst read starting at 0x01 (Temperature LSB). A7=0 selects READ. ds1722_ce_high();</p>
+<pre><code>(void)spi1_txrx(0x01);         // send address; discard returned junk
+uint8_t lsb = spi1_txrx(0x00); // read LSB by clocking 8 dummy bits
+uint8_t msb = spi1_txrx(0x00); // read MSB
+
+// Ensure the shift is finished before dropping CE
+while (DS1722_SPI-&gt;SR &amp; SPI_SR_BSY) { /* spin */ }
+ds1722_ce_low();
+
+// Combine and convert: 16-bit two's complement; scale = 1/256 °C
+uint16_t raw = ((uint16_t)msb &lt;&lt; 8) | lsb;
+float temp_c = ((int16_t)raw) / 256.0f;
+
+return temp_c;</code></pre>
+<p>}</p>
+<p>The HTML code was able to compile but the following temperature code failed because it wrote the address for the MSB on the same command as when it stored the values which was an issue I ran into that gave me bugs.</p>
+<p>Overall though, the HTML was a lot more advanced than what I had and we used similar GPIo functions/clocks to set the SPI up.</p>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
