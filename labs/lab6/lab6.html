@@ -224,77 +224,75 @@ ul.task-list li input[type="checkbox"] {
 
 Write me a C function to carry out a SPI transaction to retrieve a temperature reading from a DS1722 sensor. Make use of CMSIS libraries for the STM32L432KC.</code></pre>
 <p>It gave me:</p>
-&lt;!DOCTYPE html&gt;
-
-
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>
-Temperature Sensor Portal
-</title>
-<style>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;meta charset="utf-8" /&gt;
+&lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+&lt;title&gt;Temperature Sensor Portal&lt;/title&gt;
+&lt;style&gt;
     /*
-      Temperature Sensor Web Portal — single file, no dependencies.
+    Temperature Sensor Web Portal — single file, no dependencies.
 
-      🔌 Hooking up to your backend/device
-      ------------------------------------
-      Expected endpoints (override in the API config below):
-        GET  /api/temperature -> { "value": number, "unit": "C" | "F" }
-        GET  /api/led         -> { "on": boolean }
-        POST /api/led         -> { "on": boolean }
-        POST /api/precision   -> { "decimals": 0..3 }  (optional if device supports it)
+    🔌 Hooking up to your backend/device
+    ------------------------------------
+    Expected endpoints (override in the API config below):
+        GET  /api/temperature -&gt; { "value": number, "unit": "C" | "F" }
+        GET  /api/led         -&gt; { "on": boolean }
+        POST /api/led         -&gt; { "on": boolean }
+        POST /api/precision   -&gt; { "decimals": 0..3 }  (optional if device supports it)
 
-      Notes:
+    Notes:
         • The UI auto-enters Demo Mode if the above endpoints are not reachable, so you can preview the page immediately.
         • To force demo mode, add ?demo=1 to the URL.
         • To point at another host (e.g., a microcontroller), set API.base below, e.g. "http://192.168.1.42".
     */
 
     :root {
-      --bg: hsl(220 16% 9%);
-      --card: hsl(0 0% 100% / 0.06);
-      --text: hsl(0 0% 96%);
-      --muted: hsl(220 10% 65%);
-      --border: hsl(0 0% 100% / 0.14);
-      --accent: hsl(260 100% 73%);
-      --good: hsl(142 72% 45%);
-      --warn: hsl(38 92% 50%);
-      --bad: hsl(0 84% 60%);
-      --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    --bg: hsl(220 16% 9%);
+    --card: hsl(0 0% 100% / 0.06);
+    --text: hsl(0 0% 96%);
+    --muted: hsl(220 10% 65%);
+    --border: hsl(0 0% 100% / 0.14);
+    --accent: hsl(260 100% 73%);
+    --good: hsl(142 72% 45%);
+    --warn: hsl(38 92% 50%);
+    --bad: hsl(0 84% 60%);
+    --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
     }
     @media (prefers-color-scheme: light) {
-      :root {
+    :root {
         --bg: hsl(0 0% 98%);
         --card: #ffffff;
         --text: #0b1220;
         --muted: #5c667a;
         --border: #e5e7eb;
         --shadow: 0 6px 18px rgba(0,0,0,0.08);
-      }
+    }
     }
 
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      color: var(--text);
-      background: radial-gradient(1200px 700px at 20% -20%, rgba(124,108,255,0.22), transparent 60%),
-                  radial-gradient(900px 600px at 120% 0%, rgba(0, 199, 255, 0.18), transparent 60%),
-                  var(--bg);
-      line-height: 1.35;
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    color: var(--text);
+    background: radial-gradient(1200px 700px at 20% -20%, rgba(124,108,255,0.22), transparent 60%),
+                radial-gradient(900px 600px at 120% 0%, rgba(0, 199, 255, 0.18), transparent 60%),
+                var(--bg);
+    line-height: 1.35;
     }
 
     .container { max-width: 1040px; margin: 0 auto; padding: 28px 20px 40px; }
 
     header.app-header {
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      margin-bottom: 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 16px;
     }
     .title {
-      font-size: clamp(1.25rem, 1rem + 2vw, 2rem);
-      font-weight: 700;
-      letter-spacing: -0.01em;
+    font-size: clamp(1.25rem, 1rem + 2vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.01em;
     }
     .status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--card); }
     .status-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--muted); box-shadow: 0 0 0 2px rgba(0,0,0,0.1) inset; }
@@ -304,20 +302,20 @@ Temperature Sensor Portal
     @media (max-width: 880px) { .grid { grid-template-columns: 1fr; } }
 
     .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      box-shadow: var(--shadow);
-      padding: 18px;
-      backdrop-filter: saturate(140%) blur(6px);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 18px;
+    backdrop-filter: saturate(140%) blur(6px);
     }
 
     /* Temperature Card */
     .temp-card { display: grid; grid-template-rows: auto auto auto auto; gap: 14px; }
     .temp-header { display: flex; align-items: center; justify-content: space-between; }
     .temp-reading {
-      display: flex; align-items: baseline; gap: 12px; user-select: none;
-      font-variant-numeric: tabular-nums lining-nums;
+    display: flex; align-items: baseline; gap: 12px; user-select: none;
+    font-variant-numeric: tabular-nums lining-nums;
     }
     .temp-value { font-size: clamp(3rem, 6vw, 5.5rem); font-weight: 800; letter-spacing: -0.02em; }
     .temp-unit { font-size: clamp(1.1rem, 1.2vw, 1.35rem); color: var(--muted); font-weight: 600; }
@@ -360,361 +358,401 @@ Temperature Sensor Portal
     .link:hover { text-decoration: underline; }
 
     .btn {
-      --btn-bg: transparent;
-      display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--btn-bg); color: var(--text); cursor: pointer;
-      transition: background 160ms ease, transform 60ms ease;
+    --btn-bg: transparent;
+    display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--btn-bg); color: var(--text); cursor: pointer;
+    transition: background 160ms ease, transform 60ms ease;
     }
     .btn:hover { background: hsl(0 0% 100% / 0.06); }
     .btn:active { transform: translateY(1px); }
 
     /* Accessibility */
     .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
-  </style>
-
-
-<div class="container">
-<pre><code>&lt;header class="app-header" aria-live="polite"&gt;
-  &lt;div class="title"&gt;🌡️ Temperature Sensor Portal&lt;/div&gt;
-  &lt;div class="status-pill" id="connPill" title="Connection status"&gt;
-    &lt;span class="status-dot" id="connDot"&gt;&lt;/span&gt;
-    &lt;span class="status-label" id="connLabel"&gt;Connecting…&lt;/span&gt;
-  &lt;/div&gt;
-&lt;/header&gt;
-
-&lt;section class="grid"&gt;
-  &lt;!-- Temperature card --&gt;
-  &lt;article class="card temp-card" aria-labelledby="tempLabel"&gt;
-    &lt;div class="temp-header"&gt;
-      &lt;div id="tempLabel" class="muted"&gt;Current temperature&lt;/div&gt;
-      &lt;button class="btn" id="refreshBtn" type="button" title="Refresh now"&gt;
-        ↻ Refresh
-      &lt;/button&gt;
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class="container"&gt;
+    &lt;header class="app-header" aria-live="polite"&gt;
+    &lt;div class="title"&gt;🌡️ Temperature Sensor Portal&lt;/div&gt;
+    &lt;div class="status-pill" id="connPill" title="Connection status"&gt;
+        &lt;span class="status-dot" id="connDot"&gt;&lt;/span&gt;
+        &lt;span class="status-label" id="connLabel"&gt;Connecting…&lt;/span&gt;
     &lt;/div&gt;
+    &lt;/header&gt;
 
-    &lt;div class="temp-reading" aria-live="polite"&gt;
-      &lt;div class="temp-value" id="tempValue"&gt;--.—&lt;/div&gt;
-      &lt;div class="temp-unit" id="tempUnit"&gt;°C&lt;/div&gt;
-    &lt;/div&gt;
-
-    &lt;div class="gauge" aria-hidden="true"&gt;
-      &lt;div class="fill" id="gaugeFill"&gt;&lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class="gauge-labels"&gt;&lt;span id="gaugeMin"&gt;-10°&lt;/span&gt;&lt;span id="gaugeMax"&gt;50°&lt;/span&gt;&lt;/div&gt;
-
-    &lt;div class="temp-meta"&gt;
-      &lt;span id="updatedAt"&gt;Waiting for data…&lt;/span&gt;
-      &lt;span&gt;•&lt;/span&gt;
-      &lt;span id="sampleRate"&gt;1s&lt;/span&gt;
-    &lt;/div&gt;
-
-    &lt;div class="controls"&gt;
-      &lt;div class="precision"&gt;
-        &lt;div class="label"&gt;Precision (decimals shown)&lt;/div&gt;
-        &lt;div class="ctl"&gt;
-          &lt;input id="precisionRange" type="range" min="0" max="3" step="1" value="1" aria-label="Precision in decimal places"&gt;
-          &lt;output id="precisionValue"&gt;1&lt;/output&gt;
-          &lt;label title="Attempt to set sensor resolution on device (optional)"&gt;
-            &lt;input id="persistPrecision" type="checkbox"&gt; &lt;span class="muted"&gt;also apply to device (if supported)&lt;/span&gt;
-          &lt;/label&gt;
+    &lt;section class="grid"&gt;
+    &lt;!-- Temperature card --&gt;
+    &lt;article class="card temp-card" aria-labelledby="tempLabel"&gt;
+        &lt;div class="temp-header"&gt;
+        &lt;div id="tempLabel" class="muted"&gt;Current temperature&lt;/div&gt;
+        &lt;button class="btn" id="refreshBtn" type="button" title="Refresh now"&gt;
+            ↻ Refresh
+        &lt;/button&gt;
         &lt;/div&gt;
-        &lt;small&gt;Tip: Precision affects on-screen formatting. If your device supports it, ticking the box will POST to &lt;code&gt;/api/precision&lt;/code&gt;.&lt;/small&gt;
-      &lt;/div&gt;
+
+        &lt;div class="temp-reading" aria-live="polite"&gt;
+        &lt;div class="temp-value" id="tempValue"&gt;--.—&lt;/div&gt;
+        &lt;div class="temp-unit" id="tempUnit"&gt;°C&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div class="gauge" aria-hidden="true"&gt;
+        &lt;div class="fill" id="gaugeFill"&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="gauge-labels"&gt;&lt;span id="gaugeMin"&gt;-10°&lt;/span&gt;&lt;span id="gaugeMax"&gt;50°&lt;/span&gt;&lt;/div&gt;
+
+        &lt;div class="temp-meta"&gt;
+        &lt;span id="updatedAt"&gt;Waiting for data…&lt;/span&gt;
+        &lt;span&gt;•&lt;/span&gt;
+        &lt;span id="sampleRate"&gt;1s&lt;/span&gt;
+        &lt;/div&gt;
+
+        &lt;div class="controls"&gt;
+        &lt;div class="precision"&gt;
+            &lt;div class="label"&gt;Precision (decimals shown)&lt;/div&gt;
+            &lt;div class="ctl"&gt;
+            &lt;input id="precisionRange" type="range" min="0" max="3" step="1" value="1" aria-label="Precision in decimal places"&gt;
+            &lt;output id="precisionValue"&gt;1&lt;/output&gt;
+            &lt;label title="Attempt to set sensor resolution on device (optional)"&gt;
+                &lt;input id="persistPrecision" type="checkbox"&gt; &lt;span class="muted"&gt;also apply to device (if supported)&lt;/span&gt;
+            &lt;/label&gt;
+            &lt;/div&gt;
+            &lt;small&gt;Tip: Precision affects on-screen formatting. If your device supports it, ticking the box will POST to &lt;code&gt;/api/precision&lt;/code&gt;.&lt;/small&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/article&gt;
+
+    &lt;!-- LED card --&gt;
+    &lt;aside class="card led-card" aria-labelledby="ledLabel"&gt;
+        &lt;div class="led-row"&gt;
+        &lt;div class="led-title" id="ledLabel"&gt;&lt;span class="led-dot" id="ledDot"&gt;&lt;/span&gt; LED Control&lt;/div&gt;
+        &lt;label class="switch"&gt;
+            &lt;input id="ledToggle" type="checkbox" aria-label="Toggle LED on device"&gt;
+            &lt;span class="slider"&gt;&lt;/span&gt;
+        &lt;/label&gt;
+        &lt;/div&gt;
+        &lt;div class="muted" id="ledStatus"&gt;Status: —&lt;/div&gt;
+    &lt;/aside&gt;
+    &lt;/section&gt;
+
+    &lt;footer class="app-footer"&gt;
+    &lt;div class="muted"&gt;Device: &lt;span id="deviceName"&gt;Default&lt;/span&gt;&lt;/div&gt;
+    &lt;div class="demo-pill" id="demoPill" hidden&gt;Demo Mode (no device connected)&lt;/div&gt;
+    &lt;/footer&gt;
     &lt;/div&gt;
-  &lt;/article&gt;
 
-  &lt;!-- LED card --&gt;
-  &lt;aside class="card led-card" aria-labelledby="ledLabel"&gt;
-    &lt;div class="led-row"&gt;
-      &lt;div class="led-title" id="ledLabel"&gt;&lt;span class="led-dot" id="ledDot"&gt;&lt;/span&gt; LED Control&lt;/div&gt;
-      &lt;label class="switch"&gt;
-        &lt;input id="ledToggle" type="checkbox" aria-label="Toggle LED on device"&gt;
-        &lt;span class="slider"&gt;&lt;/span&gt;
-      &lt;/label&gt;
-    &lt;/div&gt;
-    &lt;div class="muted" id="ledStatus"&gt;Status: —&lt;/div&gt;
-  &lt;/aside&gt;
-&lt;/section&gt;
+    &lt;script&gt;
+        // -----------------------
+        // Config
+        // -----------------------
+        const API = {
+        base: '', // e.g., 'http://192.168.1.42' if the device is on the LAN
+        routes: {
+            temperature: '/api/temperature', // GET  -&gt; { value: number, unit: 'C'|'F' }
+            ledGet: '/api/led',              // GET  -&gt; { on: boolean }
+            ledSet: '/api/led',              // POST -&gt; { on: boolean }
+            precision: '/api/precision'      // POST -&gt; { decimals: 0..3 } (optional)
+        },
+        pollMs: 1000,
+        // Gauge display range (tune for your sensor/env)
+        gauge: { min: -10, max: 50 }
+        };
 
-&lt;footer class="app-footer"&gt;
-  &lt;div class="muted"&gt;Device: &lt;span id="deviceName"&gt;Default&lt;/span&gt;&lt;/div&gt;
-  &lt;div class="demo-pill" id="demoPill" hidden&gt;Demo Mode (no device connected)&lt;/div&gt;
-&lt;/footer&gt;
-&lt;/div&gt;
+        // -----------------------
+        // Helpers
+        // -----------------------
+        const $ = sel =&gt; document.querySelector(sel);
+        const sleep = ms =&gt; new Promise(r =&gt; setTimeout(r, ms));
+        const clamp = (n, a, b) =&gt; Math.min(b, Math.max(a, n));
 
-&lt;script&gt;
-    // -----------------------
-    // Config
-    // -----------------------
-    const API = {
-    base: '', // e.g., 'http://192.168.1.42' if the device is on the LAN
-    routes: {
-        temperature: '/api/temperature', // GET  -&gt; { value: number, unit: 'C'|'F' }
-        ledGet: '/api/led',              // GET  -&gt; { on: boolean }
-        ledSet: '/api/led',              // POST -&gt; { on: boolean }
-        precision: '/api/precision'      // POST -&gt; { decimals: 0..3 } (optional)
-    },
-    pollMs: 1000,
-    // Gauge display range (tune for your sensor/env)
-    gauge: { min: -10, max: 50 }
-    };
-
-    // -----------------------
-    // Helpers
-    // -----------------------
-    const $ = sel =&gt; document.querySelector(sel);
-    const sleep = ms =&gt; new Promise(r =&gt; setTimeout(r, ms));
-    const clamp = (n, a, b) =&gt; Math.min(b, Math.max(a, n));
-
-    function url(path) { return API.base + path; }
-    async function getJSON(path, opts = {}) {
-    const res = await fetch(url(path), { ...opts, headers: { 'Accept': 'application/json', ...(opts.headers||{}) }, cache: 'no-cache' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    return res.json();
-    }
-    async function postJSON(path, body) {
-    const res = await fetch(url(path), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify(body)
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    return res.json().catch(() =&gt; ({}));
-    }
-
-    function formatTemp(value, decimals, unit) {
-    const nf = new Intl.NumberFormat(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-    const symbol = unit === 'F' ? '°F' : '°C';
-    return { text: nf.format(value), unit: symbol };
-    }
-
-    function setConnStatus(status) {
-    const dot = $('#connDot');
-    const label = $('#connLabel');
-    if (status === 'online') { dot.style.background = 'var(--good)'; label.textContent = 'Online'; }
-    else if (status === 'connecting') { dot.style.background = 'var(--warn)'; label.textContent = 'Connecting…'; }
-    else { dot.style.background = 'var(--bad)'; label.textContent = 'Offline'; }
-    }
-
-    function updateGauge(value) {
-    const { min, max } = API.gauge;
-    const pct = clamp(((value - min) / (max - min)) * 100, 0, 100);
-    const fill = $('#gaugeFill');
-    fill.style.width = pct.toFixed(1) + '%';
-    // Color blend cool-&gt;warm
-    const cool = '#00d2ff', warm = '#ff6b6b';
-    fill.style.background = `linear-gradient(90deg, ${cool}, ${warm})`;
-    $('#gaugeMin').textContent = `${min}°`;
-    $('#gaugeMax').textContent = `${max}°`;
-    }
-
-    function setLEDUI(on) {
-    const dot = $('#ledDot');
-    dot.style.background = on ? 'var(--good)' : '#737373';
-    $('#ledStatus').textContent = 'Status: ' + (on ? 'On' : 'Off');
-    $('#ledToggle').checked = !!on;
-    }
-
-    function setDemoModeUI(enabled) {
-    $('#demoPill').hidden = !enabled;
-    $('#deviceName').textContent = enabled ? 'Demo' : 'Default';
-    }
-
-    // -----------------------
-    // State
-    // -----------------------
-    let decimals = Number(localStorage.getItem('precision.decimals') ?? 1);
-    let unit = 'C';
-    let demoMode = false;
-    let polling = null;
-
-    // -----------------------
-    // Init
-    // -----------------------
-    async function init() {
-    // Precision UI
-    $('#precisionRange').value = String(decimals);
-    $('#precisionValue').value = String(decimals);
-    $('#tempUnit').textContent = unit === 'F' ? '°F' : '°C';
-    setConnStatus('connecting');
-
-    // Demo toggle via query
-    demoMode = new URLSearchParams(location.search).has('demo');
-
-    // Try a quick capability probe unless demo forced
-    if (!demoMode) {
-        try {
-        const probe = await Promise.race([
-            getJSON(API.routes.temperature),
-            sleep(1200).then(() =&gt; { throw new Error('timeout'); })
-        ]);
-        if (probe &amp;&amp; typeof probe.value === 'number') {
-            unit = (probe.unit || 'C').toUpperCase() === 'F' ? 'F' : 'C';
-            $('#tempUnit').textContent = unit === 'F' ? '°F' : '°C';
-            setConnStatus('online');
-        } else {
-            demoMode = true;
+        function url(path) { return API.base + path; }
+        async function getJSON(path, opts = {}) {
+        const res = await fetch(url(path), { ...opts, headers: { 'Accept': 'application/json', ...(opts.headers||{}) }, cache: 'no-cache' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
         }
-        } catch (e) {
-        demoMode = true;
+        async function postJSON(path, body) {
+        const res = await fetch(url(path), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json().catch(() =&gt; ({}));
         }
-    }
 
-    setDemoModeUI(demoMode);
-    if (demoMode) setConnStatus('offline');
-
-    // LED bootstrap
-    try {
-        if (demoMode) setLEDUI(false);
-        else {
-        const led = await getJSON(API.routes.ledGet);
-        setLEDUI(!!led.on);
+        function formatTemp(value, decimals, unit) {
+        const nf = new Intl.NumberFormat(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        const symbol = unit === 'F' ? '°F' : '°C';
+        return { text: nf.format(value), unit: symbol };
         }
-    } catch (e) {
-        setLEDUI(false);
-    }
 
-    // Start polling
-    startPolling();
+        function setConnStatus(status) {
+        const dot = $('#connDot');
+        const label = $('#connLabel');
+        if (status === 'online') { dot.style.background = 'var(--good)'; label.textContent = 'Online'; }
+        else if (status === 'connecting') { dot.style.background = 'var(--warn)'; label.textContent = 'Connecting…'; }
+        else { dot.style.background = 'var(--bad)'; label.textContent = 'Offline'; }
+        }
 
-    // UI handlers
-    $('#refreshBtn').addEventListener('click', () =&gt; refreshNow(true));
+        function updateGauge(value) {
+        const { min, max } = API.gauge;
+        const pct = clamp(((value - min) / (max - min)) * 100, 0, 100);
+        const fill = $('#gaugeFill');
+        fill.style.width = pct.toFixed(1) + '%';
+        // Color blend cool-&gt;warm
+        const cool = '#00d2ff', warm = '#ff6b6b';
+        fill.style.background = `linear-gradient(90deg, ${cool}, ${warm})`;
+        $('#gaugeMin').textContent = `${min}°`;
+        $('#gaugeMax').textContent = `${max}°`;
+        }
 
-    $('#precisionRange').addEventListener('input', (e) =&gt; {
-        decimals = Number(e.target.value);
+        function setLEDUI(on) {
+        const dot = $('#ledDot');
+        dot.style.background = on ? 'var(--good)' : '#737373';
+        $('#ledStatus').textContent = 'Status: ' + (on ? 'On' : 'Off');
+        $('#ledToggle').checked = !!on;
+        }
+
+        function setDemoModeUI(enabled) {
+        $('#demoPill').hidden = !enabled;
+        $('#deviceName').textContent = enabled ? 'Demo' : 'Default';
+        }
+
+        // -----------------------
+        // State
+        // -----------------------
+        let decimals = Number(localStorage.getItem('precision.decimals') ?? 1);
+        let unit = 'C';
+        let demoMode = false;
+        let polling = null;
+
+        // -----------------------
+        // Init
+        // -----------------------
+        async function init() {
+        // Precision UI
+        $('#precisionRange').value = String(decimals);
         $('#precisionValue').value = String(decimals);
-        localStorage.setItem('precision.decimals', String(decimals));
-    });
+        $('#tempUnit').textContent = unit === 'F' ? '°F' : '°C';
+        setConnStatus('connecting');
 
-    $('#precisionRange').addEventListener('change', async () =&gt; {
-        if ($('#persistPrecision').checked &amp;&amp; !demoMode) {
-        try { await postJSON(API.routes.precision, { decimals }); }
-        catch (e) { console.warn('precision POST failed', e); }
+        // Demo toggle via query
+        demoMode = new URLSearchParams(location.search).has('demo');
+
+        // Try a quick capability probe unless demo forced
+        if (!demoMode) {
+            try {
+            const probe = await Promise.race([
+                getJSON(API.routes.temperature),
+                sleep(1200).then(() =&gt; { throw new Error('timeout'); })
+            ]);
+            if (probe &amp;&amp; typeof probe.value === 'number') {
+                unit = (probe.unit || 'C').toUpperCase() === 'F' ? 'F' : 'C';
+                $('#tempUnit').textContent = unit === 'F' ? '°F' : '°C';
+                setConnStatus('online');
+            } else {
+                demoMode = true;
+            }
+            } catch (e) {
+            demoMode = true;
+            }
         }
-    });
 
-    $('#ledToggle').addEventListener('change', async (e) =&gt; {
-        const next = !!e.target.checked;
-        setLEDUI(next);
-        if (demoMode) return;
+        setDemoModeUI(demoMode);
+        if (demoMode) setConnStatus('offline');
+
+        // LED bootstrap
         try {
-        await postJSON(API.routes.ledSet, { on: next });
+            if (demoMode) setLEDUI(false);
+            else {
+            const led = await getJSON(API.routes.ledGet);
+            setLEDUI(!!led.on);
+            }
+        } catch (e) {
+            setLEDUI(false);
+        }
+
+        // Start polling
+        startPolling();
+
+        // UI handlers
+        $('#refreshBtn').addEventListener('click', () =&gt; refreshNow(true));
+
+        $('#precisionRange').addEventListener('input', (e) =&gt; {
+            decimals = Number(e.target.value);
+            $('#precisionValue').value = String(decimals);
+            localStorage.setItem('precision.decimals', String(decimals));
+        });
+
+        $('#precisionRange').addEventListener('change', async () =&gt; {
+            if ($('#persistPrecision').checked &amp;&amp; !demoMode) {
+            try { await postJSON(API.routes.precision, { decimals }); }
+            catch (e) { console.warn('precision POST failed', e); }
+            }
+        });
+
+        $('#ledToggle').addEventListener('change', async (e) =&gt; {
+            const next = !!e.target.checked;
+            setLEDUI(next);
+            if (demoMode) return;
+            try {
+            await postJSON(API.routes.ledSet, { on: next });
+            } catch (err) {
+            // Revert UI on failure
+            setLEDUI(!next);
+            alert('Failed to set LED on device.');
+            }
+        });
+        }
+
+        function startPolling() {
+        if (polling) clearInterval(polling);
+        $('#sampleRate').textContent = (API.pollMs/1000).toFixed(0) + 's';
+        refreshNow(false);
+        polling = setInterval(refreshNow, API.pollMs);
+        }
+
+        async function refreshNow(manual = false) {
+        const t0 = Date.now();
+        try {
+            let value, u;
+            if (demoMode) {
+            const base = 24.8;
+            const drift = Math.sin(Date.now()/60000) * 1.2;
+            value = base + drift + (Math.random() - 0.5) * 0.2; // gentle noise
+            u = unit;
+            await sleep(120); // simulate latency
+            } else {
+            const data = await getJSON(API.routes.temperature);
+            value = Number(data.value);
+            u = (data.unit || 'C').toUpperCase();
+            unit = u;
+            setConnStatus('online');
+            $('#tempUnit').textContent = u === 'F' ? '°F' : '°C';
+            }
+
+            const { text, unit: symbol } = formatTemp(value, decimals, u);
+            $('#tempValue').textContent = text;
+            $('#tempUnit').textContent = symbol;
+            updateGauge(u === 'F' ? (value - 32) * 5/9 : value); // gauge is calibrated in °C
+            $('#updatedAt').textContent = 'Updated ' + new Date().toLocaleTimeString();
+
         } catch (err) {
-        // Revert UI on failure
-        setLEDUI(!next);
-        alert('Failed to set LED on device.');
+            if (!demoMode) setConnStatus('offline');
+            if (manual) alert('Failed to fetch temperature.');
+        } finally {
+            // noop; useful anchor for timing metrics
+            const _dt = Date.now() - t0;
         }
-    });
-    }
-
-    function startPolling() {
-    if (polling) clearInterval(polling);
-    $('#sampleRate').textContent = (API.pollMs/1000).toFixed(0) + 's';
-    refreshNow(false);
-    polling = setInterval(refreshNow, API.pollMs);
-    }
-
-    async function refreshNow(manual = false) {
-    const t0 = Date.now();
-    try {
-        let value, u;
-        if (demoMode) {
-        const base = 24.8;
-        const drift = Math.sin(Date.now()/60000) * 1.2;
-        value = base + drift + (Math.random() - 0.5) * 0.2; // gentle noise
-        u = unit;
-        await sleep(120); // simulate latency
-        } else {
-        const data = await getJSON(API.routes.temperature);
-        value = Number(data.value);
-        u = (data.unit || 'C').toUpperCase();
-        unit = u;
-        setConnStatus('online');
-        $('#tempUnit').textContent = u === 'F' ? '°F' : '°C';
         }
 
-        const { text, unit: symbol } = formatTemp(value, decimals, u);
-        $('#tempValue').textContent = text;
-        $('#tempUnit').textContent = symbol;
-        updateGauge(u === 'F' ? (value - 32) * 5/9 : value); // gauge is calibrated in °C
-        $('#updatedAt').textContent = 'Updated ' + new Date().toLocaleTimeString();
-
-    } catch (err) {
-        if (!demoMode) setConnStatus('offline');
-        if (manual) alert('Failed to fetch temperature.');
-    } finally {
-        // noop; useful anchor for timing metrics
-        const _dt = Date.now() - t0;
-    }
-    }
-
-    // Boot
-    document.addEventListener('DOMContentLoaded', init);
-&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
+        // Boot
+        document.addEventListener('DOMContentLoaded', init);
+    &lt;/script&gt;
+    &lt;/body&gt;
+    &lt;/html&gt;</code></pre>
 <p>It even tried to encode this quarto page!</p>
 <p>AND FOR SPI:</p>
-<p>// ds1722_stm32l432.c // CMSIS-only (no HAL). Tested layout assumes SPI1 on PA5/PA6/PA7 and CE on PA4.</p>
-<p>#include “stm32l432xx.h” #include &lt;stdint.h&gt;</p>
-<p>#define DS1722_CE_GPIO GPIOA #define DS1722_CE_PIN 4U // PA4 used as CE (active HIGH per DS1722) #define DS1722_SPI SPI1</p>
-<p>// —– CE helpers (active HIGH) —– static inline void ds1722_ce_high(void) { DS1722_CE_GPIO-&gt;BSRR = (1U &lt;&lt; DS1722_CE_PIN); } static inline void ds1722_ce_low (void) { DS1722_CE_GPIO-&gt;BRR = (1U &lt;&lt; DS1722_CE_PIN); }</p>
-<p>// —– 8-bit full-duplex transfer on SPI1 —– static inline uint8_t spi1_txrx(uint8_t tx) { // Wait until TX buffer empty while ((DS1722_SPI-&gt;SR &amp; SPI_SR_TXE) == 0) { /* spin <em>/ } </em>(__IO uint8_t *)&amp;DS1722_SPI-&gt;DR = tx; // 8-bit write</p>
-<pre><code>// Wait until a byte is received
-while ((DS1722_SPI-&gt;SR &amp; SPI_SR_RXNE) == 0) { /* spin */ }
-return *(__IO uint8_t *)&amp;DS1722_SPI-&gt;DR;          // 8-bit read</code></pre>
-<p>}</p>
-<p>// —– Minimal SPI1 + GPIO init (CPHA=1, CPOL=0, 8-bit) —– void DS1722_SPI1_Init(void) { // Clocks RCC-&gt;AHB2ENR |= RCC_AHB2ENR_GPIOAEN; RCC-&gt;APB2ENR |= RCC_APB2ENR_SPI1EN;</p>
-<pre><code>// PA5=SCK, PA6=MISO, PA7=MOSI -&gt; AF5
-GPIOA-&gt;MODER  &amp;= ~((3U&lt;&lt;(5*2)) | (3U&lt;&lt;(6*2)) | (3U&lt;&lt;(7*2)));
-GPIOA-&gt;MODER  |=  ((2U&lt;&lt;(5*2)) | (2U&lt;&lt;(6*2)) | (2U&lt;&lt;(7*2)));
-GPIOA-&gt;AFR[0] &amp;= ~((0xF&lt;&lt;(5*4)) | (0xF&lt;&lt;(6*4)) | (0xF&lt;&lt;(7*4)));
-GPIOA-&gt;AFR[0] |=  ((5U&lt;&lt;(5*4)) | (5U&lt;&lt;(6*4)) | (5U&lt;&lt;(7*4)));
-GPIOA-&gt;OSPEEDR|=  ((2U&lt;&lt;(5*2)) | (2U&lt;&lt;(6*2)) | (2U&lt;&lt;(7*2)));   // medium/high
-GPIOA-&gt;PUPDR  &amp;= ~((3U&lt;&lt;(5*2)) | (3U&lt;&lt;(6*2)) | (3U&lt;&lt;(7*2)));   // no pulls
+<pre><code>// ds1722_stm32l432.c
+// CMSIS-only (no HAL). Tested layout assumes SPI1 on PA5/PA6/PA7 and CE on PA4.
 
-// PA4 as CE (GPIO out), idle LOW
-GPIOA-&gt;MODER  &amp;= ~(3U&lt;&lt;(DS1722_CE_PIN*2));
-GPIOA-&gt;MODER  |=  (1U&lt;&lt;(DS1722_CE_PIN*2));                    // output
-ds1722_ce_low();
+#include "stm32l432xx.h"
+#include &lt;stdint.h&gt;
 
-// Disable SPI while configuring
-DS1722_SPI-&gt;CR1 = 0;
-DS1722_SPI-&gt;CR2 = 0;
+#define DS1722_CE_GPIO      GPIOA
+#define DS1722_CE_PIN       4U          // PA4 used as CE (active HIGH per DS1722)
+#define DS1722_SPI          SPI1
 
-// Data size = 8-bit, RXNE flag at 8-bit threshold
-DS1722_SPI-&gt;CR2 = (7U &lt;&lt; SPI_CR2_DS_Pos) | SPI_CR2_FRXTH;
+// ----- CE helpers (active HIGH) -----
+static inline void ds1722_ce_high(void) { DS1722_CE_GPIO-&gt;BSRR = (1U &lt;&lt; DS1722_CE_PIN); }
+static inline void ds1722_ce_low (void) { DS1722_CE_GPIO-&gt;BRR  = (1U &lt;&lt; DS1722_CE_PIN); }
 
-// Master, CPOL=0, CPHA=1 (required by DS1722), SW-NSS, prescaler fPCLK/32
-DS1722_SPI-&gt;CR1 =
-    SPI_CR1_MSTR |
-    SPI_CR1_SSM  | SPI_CR1_SSI |
-    SPI_CR1_CPHA |             // CPHA must be 1
-    (4U &lt;&lt; SPI_CR1_BR_Pos);    // BR=100: /32 (safe; sensor is slow)
+// ----- 8-bit full-duplex transfer on SPI1 -----
+static inline uint8_t spi1_txrx(uint8_t tx)
+{
+    // Wait until TX buffer empty
+    while ((DS1722_SPI-&gt;SR &amp; SPI_SR_TXE) == 0) { /* spin */ }
+    *(__IO uint8_t *)&amp;DS1722_SPI-&gt;DR = tx;            // 8-bit write
 
-// Enable SPI
-DS1722_SPI-&gt;CR1 |= SPI_CR1_SPE;</code></pre>
-<p>}</p>
-<p>// —– (Optional) Put DS1722 in continuous 12-bit mode (SD=0, R2=1) —– void DS1722_Start_12bit_Continuous(void) { // Write configuration register @ 0x80 with value 0xE8: // 1110 1000 -&gt; [1][1][1][1SHOT=0][R2=1][R1=0][R0=0][SD=0] ds1722_ce_high(); (void)spi1_txrx(0x80); // write address for CONFIG (void)spi1_txrx(0xE8); // config value: 12-bit, continuous // Wait for last bit out while (DS1722_SPI-&gt;SR &amp; SPI_SR_BSY) { /* spin */ } ds1722_ce_low(); }</p>
-<p>// —– READ: returns temperature in °C (blocking, burst read of 2 bytes) —– float DS1722_Read_Temperature_C(void) { // Burst read starting at 0x01 (Temperature LSB). A7=0 selects READ. ds1722_ce_high();</p>
-<pre><code>(void)spi1_txrx(0x01);         // send address; discard returned junk
-uint8_t lsb = spi1_txrx(0x00); // read LSB by clocking 8 dummy bits
-uint8_t msb = spi1_txrx(0x00); // read MSB
+    // Wait until a byte is received
+    while ((DS1722_SPI-&gt;SR &amp; SPI_SR_RXNE) == 0) { /* spin */ }
+    return *(__IO uint8_t *)&amp;DS1722_SPI-&gt;DR;          // 8-bit read
+}
 
-// Ensure the shift is finished before dropping CE
-while (DS1722_SPI-&gt;SR &amp; SPI_SR_BSY) { /* spin */ }
-ds1722_ce_low();
+// ----- Minimal SPI1 + GPIO init (CPHA=1, CPOL=0, 8-bit) -----
+void DS1722_SPI1_Init(void)
+{
+    // Clocks
+    RCC-&gt;AHB2ENR  |= RCC_AHB2ENR_GPIOAEN;
+    RCC-&gt;APB2ENR  |= RCC_APB2ENR_SPI1EN;
 
-// Combine and convert: 16-bit two's complement; scale = 1/256 °C
-uint16_t raw = ((uint16_t)msb &lt;&lt; 8) | lsb;
-float temp_c = ((int16_t)raw) / 256.0f;
+    // PA5=SCK, PA6=MISO, PA7=MOSI -&gt; AF5
+    GPIOA-&gt;MODER  &amp;= ~((3U&lt;&lt;(5*2)) | (3U&lt;&lt;(6*2)) | (3U&lt;&lt;(7*2)));
+    GPIOA-&gt;MODER  |=  ((2U&lt;&lt;(5*2)) | (2U&lt;&lt;(6*2)) | (2U&lt;&lt;(7*2)));
+    GPIOA-&gt;AFR[0] &amp;= ~((0xF&lt;&lt;(5*4)) | (0xF&lt;&lt;(6*4)) | (0xF&lt;&lt;(7*4)));
+    GPIOA-&gt;AFR[0] |=  ((5U&lt;&lt;(5*4)) | (5U&lt;&lt;(6*4)) | (5U&lt;&lt;(7*4)));
+    GPIOA-&gt;OSPEEDR|=  ((2U&lt;&lt;(5*2)) | (2U&lt;&lt;(6*2)) | (2U&lt;&lt;(7*2)));   // medium/high
+    GPIOA-&gt;PUPDR  &amp;= ~((3U&lt;&lt;(5*2)) | (3U&lt;&lt;(6*2)) | (3U&lt;&lt;(7*2)));   // no pulls
 
-return temp_c;</code></pre>
-<p>}</p>
+    // PA4 as CE (GPIO out), idle LOW
+    GPIOA-&gt;MODER  &amp;= ~(3U&lt;&lt;(DS1722_CE_PIN*2));
+    GPIOA-&gt;MODER  |=  (1U&lt;&lt;(DS1722_CE_PIN*2));                    // output
+    ds1722_ce_low();
+
+    // Disable SPI while configuring
+    DS1722_SPI-&gt;CR1 = 0;
+    DS1722_SPI-&gt;CR2 = 0;
+
+    // Data size = 8-bit, RXNE flag at 8-bit threshold
+    DS1722_SPI-&gt;CR2 = (7U &lt;&lt; SPI_CR2_DS_Pos) | SPI_CR2_FRXTH;
+
+    // Master, CPOL=0, CPHA=1 (required by DS1722), SW-NSS, prescaler fPCLK/32
+    DS1722_SPI-&gt;CR1 =
+        SPI_CR1_MSTR |
+        SPI_CR1_SSM  | SPI_CR1_SSI |
+        SPI_CR1_CPHA |             // CPHA must be 1
+        (4U &lt;&lt; SPI_CR1_BR_Pos);    // BR=100: /32 (safe; sensor is slow)
+
+    // Enable SPI
+    DS1722_SPI-&gt;CR1 |= SPI_CR1_SPE;
+}
+
+// ----- (Optional) Put DS1722 in continuous 12-bit mode (SD=0, R2=1) -----
+void DS1722_Start_12bit_Continuous(void)
+{
+    // Write configuration register @ 0x80 with value 0xE8:
+    // 1110 1000 -&gt; [1][1][1][1SHOT=0][R2=1][R1=0][R0=0][SD=0]
+    ds1722_ce_high();
+    (void)spi1_txrx(0x80);   // write address for CONFIG
+    (void)spi1_txrx(0xE8);   // config value: 12-bit, continuous
+    // Wait for last bit out
+    while (DS1722_SPI-&gt;SR &amp; SPI_SR_BSY) { /* spin */ }
+    ds1722_ce_low();
+}
+
+// ----- READ: returns temperature in °C (blocking, burst read of 2 bytes) -----
+float DS1722_Read_Temperature_C(void)
+{
+    // Burst read starting at 0x01 (Temperature LSB). A7=0 selects READ.
+    ds1722_ce_high();
+
+    (void)spi1_txrx(0x01);         // send address; discard returned junk
+    uint8_t lsb = spi1_txrx(0x00); // read LSB by clocking 8 dummy bits
+    uint8_t msb = spi1_txrx(0x00); // read MSB
+
+    // Ensure the shift is finished before dropping CE
+    while (DS1722_SPI-&gt;SR &amp; SPI_SR_BSY) { /* spin */ }
+    ds1722_ce_low();
+
+    // Combine and convert: 16-bit two's complement; scale = 1/256 °C
+    uint16_t raw = ((uint16_t)msb &lt;&lt; 8) | lsb;
+    float temp_c = ((int16_t)raw) / 256.0f;
+
+    return temp_c;
+}</code></pre>
 <p>The HTML code was able to compile but the following temperature code failed because it wrote the address for the MSB on the same command as when it stored the values which was an issue I ran into that gave me bugs.</p>
 <p>Overall though, the HTML was a lot more advanced than what I had with different alerts for error and in depth explainations and we used similar GPIo functions/clocks to set the SPI up.</p>
 
 
-</div>
 </section>
 </section>
 
