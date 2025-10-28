@@ -438,84 +438,85 @@ Temperature Sensor Portal
 &lt;footer class="app-footer"&gt;
   &lt;div class="muted"&gt;Device: &lt;span id="deviceName"&gt;Default&lt;/span&gt;&lt;/div&gt;
   &lt;div class="demo-pill" id="demoPill" hidden&gt;Demo Mode (no device connected)&lt;/div&gt;
-&lt;/footer&gt;</code></pre>
-</div>
-<script>
+&lt;/footer&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
     // -----------------------
     // Config
     // -----------------------
     const API = {
-      base: '', // e.g., 'http://192.168.1.42' if the device is on the LAN
-      routes: {
-        temperature: '/api/temperature', // GET  -> { value: number, unit: 'C'|'F' }
-        ledGet: '/api/led',              // GET  -> { on: boolean }
-        ledSet: '/api/led',              // POST -> { on: boolean }
-        precision: '/api/precision'      // POST -> { decimals: 0..3 } (optional)
-      },
-      pollMs: 1000,
-      // Gauge display range (tune for your sensor/env)
-      gauge: { min: -10, max: 50 }
+    base: '', // e.g., 'http://192.168.1.42' if the device is on the LAN
+    routes: {
+        temperature: '/api/temperature', // GET  -&gt; { value: number, unit: 'C'|'F' }
+        ledGet: '/api/led',              // GET  -&gt; { on: boolean }
+        ledSet: '/api/led',              // POST -&gt; { on: boolean }
+        precision: '/api/precision'      // POST -&gt; { decimals: 0..3 } (optional)
+    },
+    pollMs: 1000,
+    // Gauge display range (tune for your sensor/env)
+    gauge: { min: -10, max: 50 }
     };
 
     // -----------------------
     // Helpers
     // -----------------------
-    const $ = sel => document.querySelector(sel);
-    const sleep = ms => new Promise(r => setTimeout(r, ms));
-    const clamp = (n, a, b) => Math.min(b, Math.max(a, n));
+    const $ = sel =&gt; document.querySelector(sel);
+    const sleep = ms =&gt; new Promise(r =&gt; setTimeout(r, ms));
+    const clamp = (n, a, b) =&gt; Math.min(b, Math.max(a, n));
 
     function url(path) { return API.base + path; }
     async function getJSON(path, opts = {}) {
-      const res = await fetch(url(path), { ...opts, headers: { 'Accept': 'application/json', ...(opts.headers||{}) }, cache: 'no-cache' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
+    const res = await fetch(url(path), { ...opts, headers: { 'Accept': 'application/json', ...(opts.headers||{}) }, cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
     }
     async function postJSON(path, body) {
-      const res = await fetch(url(path), {
+    const res = await fetch(url(path), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify(body)
-      });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json().catch(() => ({}));
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json().catch(() =&gt; ({}));
     }
 
     function formatTemp(value, decimals, unit) {
-      const nf = new Intl.NumberFormat(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-      const symbol = unit === 'F' ? '°F' : '°C';
-      return { text: nf.format(value), unit: symbol };
+    const nf = new Intl.NumberFormat(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    const symbol = unit === 'F' ? '°F' : '°C';
+    return { text: nf.format(value), unit: symbol };
     }
 
     function setConnStatus(status) {
-      const dot = $('#connDot');
-      const label = $('#connLabel');
-      if (status === 'online') { dot.style.background = 'var(--good)'; label.textContent = 'Online'; }
-      else if (status === 'connecting') { dot.style.background = 'var(--warn)'; label.textContent = 'Connecting…'; }
-      else { dot.style.background = 'var(--bad)'; label.textContent = 'Offline'; }
+    const dot = $('#connDot');
+    const label = $('#connLabel');
+    if (status === 'online') { dot.style.background = 'var(--good)'; label.textContent = 'Online'; }
+    else if (status === 'connecting') { dot.style.background = 'var(--warn)'; label.textContent = 'Connecting…'; }
+    else { dot.style.background = 'var(--bad)'; label.textContent = 'Offline'; }
     }
 
     function updateGauge(value) {
-      const { min, max } = API.gauge;
-      const pct = clamp(((value - min) / (max - min)) * 100, 0, 100);
-      const fill = $('#gaugeFill');
-      fill.style.width = pct.toFixed(1) + '%';
-      // Color blend cool->warm
-      const cool = '#00d2ff', warm = '#ff6b6b';
-      fill.style.background = `linear-gradient(90deg, ${cool}, ${warm})`;
-      $('#gaugeMin').textContent = `${min}°`;
-      $('#gaugeMax').textContent = `${max}°`;
+    const { min, max } = API.gauge;
+    const pct = clamp(((value - min) / (max - min)) * 100, 0, 100);
+    const fill = $('#gaugeFill');
+    fill.style.width = pct.toFixed(1) + '%';
+    // Color blend cool-&gt;warm
+    const cool = '#00d2ff', warm = '#ff6b6b';
+    fill.style.background = `linear-gradient(90deg, ${cool}, ${warm})`;
+    $('#gaugeMin').textContent = `${min}°`;
+    $('#gaugeMax').textContent = `${max}°`;
     }
 
     function setLEDUI(on) {
-      const dot = $('#ledDot');
-      dot.style.background = on ? 'var(--good)' : '#737373';
-      $('#ledStatus').textContent = 'Status: ' + (on ? 'On' : 'Off');
-      $('#ledToggle').checked = !!on;
+    const dot = $('#ledDot');
+    dot.style.background = on ? 'var(--good)' : '#737373';
+    $('#ledStatus').textContent = 'Status: ' + (on ? 'On' : 'Off');
+    $('#ledToggle').checked = !!on;
     }
 
     function setDemoModeUI(enabled) {
-      $('#demoPill').hidden = !enabled;
-      $('#deviceName').textContent = enabled ? 'Demo' : 'Default';
+    $('#demoPill').hidden = !enabled;
+    $('#deviceName').textContent = enabled ? 'Demo' : 'Default';
     }
 
     // -----------------------
@@ -530,105 +531,105 @@ Temperature Sensor Portal
     // Init
     // -----------------------
     async function init() {
-      // Precision UI
-      $('#precisionRange').value = String(decimals);
-      $('#precisionValue').value = String(decimals);
-      $('#tempUnit').textContent = unit === 'F' ? '°F' : '°C';
-      setConnStatus('connecting');
+    // Precision UI
+    $('#precisionRange').value = String(decimals);
+    $('#precisionValue').value = String(decimals);
+    $('#tempUnit').textContent = unit === 'F' ? '°F' : '°C';
+    setConnStatus('connecting');
 
-      // Demo toggle via query
-      demoMode = new URLSearchParams(location.search).has('demo');
+    // Demo toggle via query
+    demoMode = new URLSearchParams(location.search).has('demo');
 
-      // Try a quick capability probe unless demo forced
-      if (!demoMode) {
+    // Try a quick capability probe unless demo forced
+    if (!demoMode) {
         try {
-          const probe = await Promise.race([
+        const probe = await Promise.race([
             getJSON(API.routes.temperature),
-            sleep(1200).then(() => { throw new Error('timeout'); })
-          ]);
-          if (probe && typeof probe.value === 'number') {
+            sleep(1200).then(() =&gt; { throw new Error('timeout'); })
+        ]);
+        if (probe &amp;&amp; typeof probe.value === 'number') {
             unit = (probe.unit || 'C').toUpperCase() === 'F' ? 'F' : 'C';
             $('#tempUnit').textContent = unit === 'F' ? '°F' : '°C';
             setConnStatus('online');
-          } else {
+        } else {
             demoMode = true;
-          }
-        } catch (e) {
-          demoMode = true;
         }
-      }
+        } catch (e) {
+        demoMode = true;
+        }
+    }
 
-      setDemoModeUI(demoMode);
-      if (demoMode) setConnStatus('offline');
+    setDemoModeUI(demoMode);
+    if (demoMode) setConnStatus('offline');
 
-      // LED bootstrap
-      try {
+    // LED bootstrap
+    try {
         if (demoMode) setLEDUI(false);
         else {
-          const led = await getJSON(API.routes.ledGet);
-          setLEDUI(!!led.on);
+        const led = await getJSON(API.routes.ledGet);
+        setLEDUI(!!led.on);
         }
-      } catch (e) {
+    } catch (e) {
         setLEDUI(false);
-      }
+    }
 
-      // Start polling
-      startPolling();
+    // Start polling
+    startPolling();
 
-      // UI handlers
-      $('#refreshBtn').addEventListener('click', () => refreshNow(true));
+    // UI handlers
+    $('#refreshBtn').addEventListener('click', () =&gt; refreshNow(true));
 
-      $('#precisionRange').addEventListener('input', (e) => {
+    $('#precisionRange').addEventListener('input', (e) =&gt; {
         decimals = Number(e.target.value);
         $('#precisionValue').value = String(decimals);
         localStorage.setItem('precision.decimals', String(decimals));
-      });
+    });
 
-      $('#precisionRange').addEventListener('change', async () => {
-        if ($('#persistPrecision').checked && !demoMode) {
-          try { await postJSON(API.routes.precision, { decimals }); }
-          catch (e) { console.warn('precision POST failed', e); }
+    $('#precisionRange').addEventListener('change', async () =&gt; {
+        if ($('#persistPrecision').checked &amp;&amp; !demoMode) {
+        try { await postJSON(API.routes.precision, { decimals }); }
+        catch (e) { console.warn('precision POST failed', e); }
         }
-      });
+    });
 
-      $('#ledToggle').addEventListener('change', async (e) => {
+    $('#ledToggle').addEventListener('change', async (e) =&gt; {
         const next = !!e.target.checked;
         setLEDUI(next);
         if (demoMode) return;
         try {
-          await postJSON(API.routes.ledSet, { on: next });
+        await postJSON(API.routes.ledSet, { on: next });
         } catch (err) {
-          // Revert UI on failure
-          setLEDUI(!next);
-          alert('Failed to set LED on device.');
+        // Revert UI on failure
+        setLEDUI(!next);
+        alert('Failed to set LED on device.');
         }
-      });
+    });
     }
 
     function startPolling() {
-      if (polling) clearInterval(polling);
-      $('#sampleRate').textContent = (API.pollMs/1000).toFixed(0) + 's';
-      refreshNow(false);
-      polling = setInterval(refreshNow, API.pollMs);
+    if (polling) clearInterval(polling);
+    $('#sampleRate').textContent = (API.pollMs/1000).toFixed(0) + 's';
+    refreshNow(false);
+    polling = setInterval(refreshNow, API.pollMs);
     }
 
     async function refreshNow(manual = false) {
-      const t0 = Date.now();
-      try {
+    const t0 = Date.now();
+    try {
         let value, u;
         if (demoMode) {
-          const base = 24.8;
-          const drift = Math.sin(Date.now()/60000) * 1.2;
-          value = base + drift + (Math.random() - 0.5) * 0.2; // gentle noise
-          u = unit;
-          await sleep(120); // simulate latency
+        const base = 24.8;
+        const drift = Math.sin(Date.now()/60000) * 1.2;
+        value = base + drift + (Math.random() - 0.5) * 0.2; // gentle noise
+        u = unit;
+        await sleep(120); // simulate latency
         } else {
-          const data = await getJSON(API.routes.temperature);
-          value = Number(data.value);
-          u = (data.unit || 'C').toUpperCase();
-          unit = u;
-          setConnStatus('online');
-          $('#tempUnit').textContent = u === 'F' ? '°F' : '°C';
+        const data = await getJSON(API.routes.temperature);
+        value = Number(data.value);
+        u = (data.unit || 'C').toUpperCase();
+        unit = u;
+        setConnStatus('online');
+        $('#tempUnit').textContent = u === 'F' ? '°F' : '°C';
         }
 
         const { text, unit: symbol } = formatTemp(value, decimals, u);
@@ -637,20 +638,21 @@ Temperature Sensor Portal
         updateGauge(u === 'F' ? (value - 32) * 5/9 : value); // gauge is calibrated in °C
         $('#updatedAt').textContent = 'Updated ' + new Date().toLocaleTimeString();
 
-      } catch (err) {
+    } catch (err) {
         if (!demoMode) setConnStatus('offline');
         if (manual) alert('Failed to fetch temperature.');
-      } finally {
+    } finally {
         // noop; useful anchor for timing metrics
         const _dt = Date.now() - t0;
-      }
+    }
     }
 
     // Boot
     document.addEventListener('DOMContentLoaded', init);
-  </script>
-
-
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+<p>It even tried to encode this quarto page!</p>
 <p>AND FOR SPI:</p>
 <p>// ds1722_stm32l432.c // CMSIS-only (no HAL). Tested layout assumes SPI1 on PA5/PA6/PA7 and CE on PA4.</p>
 <p>#include “stm32l432xx.h” #include &lt;stdint.h&gt;</p>
@@ -712,6 +714,7 @@ return temp_c;</code></pre>
 <p>Overall though, the HTML was a lot more advanced than what I had with different alerts for error and in depth explainations and we used similar GPIo functions/clocks to set the SPI up.</p>
 
 
+</div>
 </section>
 </section>
 
