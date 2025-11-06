@@ -159,7 +159,7 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#lab-2-multiplexed-7-segment-display" id="toc-lab-2-multiplexed-7-segment-display" class="nav-link active" data-scroll-target="#lab-2-multiplexed-7-segment-display">Lab 2 : Multiplexed 7-Segment Display</a>
+  <li><a href="#lab-3-multiplexed-7-segment-display" id="toc-lab-3-multiplexed-7-segment-display" class="nav-link active" data-scroll-target="#lab-3-multiplexed-7-segment-display">Lab 3 : Multiplexed 7-Segment Display</a>
   <ul class="collapse">
   <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
   <li><a href="#design-and-testing-methodology" id="toc-design-and-testing-methodology" class="nav-link" data-scroll-target="#design-and-testing-methodology">Design and Testing Methodology</a></li>
@@ -177,8 +177,8 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="lab-2-multiplexed-7-segment-display" class="level2">
-<h2 class="anchored" data-anchor-id="lab-2-multiplexed-7-segment-display">Lab 2 : Multiplexed 7-Segment Display</h2>
+<section id="lab-3-multiplexed-7-segment-display" class="level2">
+<h2 class="anchored" data-anchor-id="lab-3-multiplexed-7-segment-display">Lab 3 : Multiplexed 7-Segment Display</h2>
 <section id="introduction" class="level3">
 <h3 class="anchored" data-anchor-id="introduction">Introduction</h3>
 <p>In this lab I built off of Lab 2 to implement a time-multiplexing keypad scanner to drive two seven-segment displays using the same seven-segment decoder HDL module and set of FPGA GPIO pins. When a key was pressed, the design would indicate that it was pressed and record that number on the right of the dual seven seg display. Once another button was pressed, the previous digit would shift to the left hand place and the new digit would fill the right.</p>
@@ -271,7 +271,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/toplab3_2.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 8: Waveforms of top module pt.2</figcaption>
+<figcaption>Figure 8: Waveforms of debouncing</figcaption>
 </figure>
 </div>
 <p>These can be seen entering the debounce and IDLE states as well as pulseenable going off as expected. This validates my debouncing logic.</p>
@@ -319,7 +319,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/keyscanner.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 15: Waveforms of keyscanner tb</figcaption>
+<figcaption>Figure 15: Waveforms of tb</figcaption>
 </figure>
 </div>
 <p>These are all my testbenches as seen in the figures above.</p>
