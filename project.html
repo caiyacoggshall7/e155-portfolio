@@ -164,11 +164,12 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#project-description-and-overview" id="toc-project-description-and-overview" class="nav-link" data-scroll-target="#project-description-and-overview">Project Description and Overview</a></li>
   <li><a href="#specifications" id="toc-specifications" class="nav-link" data-scroll-target="#specifications">Specifications</a></li>
   <li><a href="#block-diagram" id="toc-block-diagram" class="nav-link" data-scroll-target="#block-diagram">Block Diagram</a></li>
-  <li><a href="#calculations" id="toc-calculations" class="nav-link" data-scroll-target="#calculations">Calculations</a></li>
+  <li><a href="#critical-parameter-calculations" id="toc-critical-parameter-calculations" class="nav-link" data-scroll-target="#critical-parameter-calculations">Critical Parameter Calculations</a></li>
   <li><a href="#schedule" id="toc-schedule" class="nav-link" data-scroll-target="#schedule">Schedule</a></li>
   <li><a href="#fpga-design-details" id="toc-fpga-design-details" class="nav-link" data-scroll-target="#fpga-design-details">FPGA Design Details</a></li>
   <li><a href="#mcu-design-details" id="toc-mcu-design-details" class="nav-link" data-scroll-target="#mcu-design-details">MCU Design Details</a></li>
   <li><a href="#touch-sensor-design-details" id="toc-touch-sensor-design-details" class="nav-link" data-scroll-target="#touch-sensor-design-details">Touch Sensor Design Details</a></li>
+  <li><a href="#photodiode-design-details" id="toc-photodiode-design-details" class="nav-link" data-scroll-target="#photodiode-design-details">Photodiode Design Details</a></li>
   <li><a href="#bill-of-materials" id="toc-bill-of-materials" class="nav-link" data-scroll-target="#bill-of-materials">Bill of Materials</a></li>
   </ul></li>
   </ul>
@@ -187,63 +188,29 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="project-description-and-overview" class="level3">
 <h3 class="anchored" data-anchor-id="project-description-and-overview">Project Description and Overview</h3>
-<p>Our project takes inspiration from Halloween candy buckets, themed popcorn buckets from movie theaters, and the lovable Toothless character from “How to Train Your Dragon” (arguably the best movie) to create a Toothless surprise candy bucket complete with music, lights, and an interactive jaw mechanism. Toothless can often be seen in the film being given a pat on the nose. Building off of this, we plan to implement a sensor in the nose of the mechanism that, upon touch, will open the mouth to reveal the candy in the bucket. Additionally, the MCU and FPGA will communicate to indicate when the bucket is open and display a purple LED inside of Toothless’ mouth to recreate his signature fire blast look we see in the movies. Lastly, we are both huge fans of the main theme from the first film “Test Drive”, so we plan to have a debounced button that users can press to play the theme in the background as they engage with our project.</p>
+<p>Our project takes inspiration from Halloween candy buckets, themed popcorn buckets from movie theaters, and the lovable Toothless character from “How to Train Your Dragon” (arguably the best movie) to create a Toothless surprise candy bucket complete with music, lights, and an interactive jaw mechanism. Toothless can often be seen in the film being given a pat on the nose. Building off of this, we plan to implement a sensor in the nose of the mechanism that, upon touch, will open the mouth to reveal the candy in the bucket. Additionally, the MCU and FPGA will communicate to indicate when the bucket is open and display a purple LED inside of Toothless’ mouth to recreate his signature fire blast look we see in the movies. Lastly, we are both huge fans of the main theme from the first film “Test Drive”, so we plan to have a button that users can press to play the theme in the background as they engage with our project.</p>
 </section>
 <section id="specifications" class="level3">
 <h3 class="anchored" data-anchor-id="specifications">Specifications</h3>
-<section id="proficiency" class="level4">
-<h4 class="anchored" data-anchor-id="proficiency">Proficiency</h4>
-<p><em>Music Specs</em></p>
+<section id="by-mid-way-check-off-doesnt-have-to-be-integrated" class="level4">
+<h4 class="anchored" data-anchor-id="by-mid-way-check-off-doesnt-have-to-be-integrated">By Mid-Way Check Off (Doesn’t have to be integrated)</h4>
+<ul class="task-list">
+<li><label><input type="checkbox">Capacitive touch sensor working</label></li>
+<li><label><input type="checkbox">Hand hover sensor working</label></li>
+<li><label><input type="checkbox">DFPlayer plays</label></li>
+<li><label><input type="checkbox">Servo motor moves to set angles</label></li>
+</ul>
+</section>
+<section id="by-end" class="level4">
+<h4 class="anchored" data-anchor-id="by-end">By End</h4>
 <ul class="task-list">
 <li><label><input type="checkbox">Music begins playing when jaw is opened</label></li>
 <li><label><input type="checkbox">Music stops playing when full MP3 file is done playing</label></li>
-</ul>
-<p><em>Touch Sensor Specs</em></p>
-<ul class="task-list">
-<li><label><input type="checkbox">Sensor registers the touch input only once (when jaw is open sensor does not register touch input)</label></li>
-</ul>
-<p><em>Jaw Mechanism Specs</em></p>
-<ul class="task-list">
 <li><label><input type="checkbox">Jaw opens when the nose is touched</label></li>
-<li><label><input type="checkbox">Jaw closes when button is pressed</label></li>
-<li><label><input type="checkbox">CalculatioYns provided for PWM required to sweep entire 0o to 180o range of servo motor</label></li>
-</ul>
-<p><em>LED Specs</em></p>
-<ul class="task-list">
 <li><label><input type="checkbox">LED turns on when jaw is open</label></li>
-<li><label><input type="checkbox">LED turns off when button is pressed and jaw closes</label></li>
-</ul>
-<p><em>General Specs</em></p>
-<ul class="task-list">
-<li><label><input type="checkbox">Each button press registered only once (e.g., no switch bouncing)</label></li>
-<li><label><input type="checkbox">Report includes state transition diagram(s) illustrating the operation of the system</label></li>
-</ul>
-</section>
-<section id="excellence" class="level4">
-<h4 class="anchored" data-anchor-id="excellence">Excellence</h4>
-<p><em>Music Specs</em></p>
-<ul class="task-list">
-<li><label><input type="checkbox">Calculations provided for resistor choice for the speaker.</label></li>
-<li><label><input type="checkbox">Button design registers consecutive button presses regardless of time between presses</label></li>
-<li><label><input type="checkbox">Music plays simultaneously with jaw opening</label></li>
-</ul>
-<p><em>Touch Sensor Specs</em></p>
-<ul class="task-list">
-<li><label><input type="checkbox">Delay between touch sensor and the jaw opening is less than 2 seconds</label></li>
-</ul>
-<p><em>Jaw Mechanism Specs</em></p>
-<ul class="task-list">
-<li><label><input type="checkbox">Jaw opening is slow and controlled</label></li>
-<li><label><input type="checkbox">Jaw closing is slow and controlled</label></li>
-</ul>
-<p><em>LED Specs</em></p>
-<ul class="task-list">
-<li><label><input type="checkbox">LED turns off only after jaw is done closing</label></li>
-</ul>
-<p><em>General Specs</em></p>
-<ul class="task-list">
-<li><label><input type="checkbox">Report includes state transition table to document the next state and output values for each state based on the current state and inputs</label></li>
-<li><label><input type="checkbox">State transition diagram is completely specified (i.e., all transitions between states are specified, output conditions specified in each state)</label></li>
+<li><label><input type="checkbox">LED plays programmed light shows</label></li>
+<li><label><input type="checkbox">Delay between touch sensor and the jaw opening is imperceptible</label></li>
+<li><label><input type="checkbox">When sensor inside mouth is covered, Toothless’ roar plays through speaker and jaw closes partially before returning to fully open state</label></li>
 </ul>
 </section>
 </section>
@@ -251,36 +218,50 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="block-diagram">Block Diagram</h3>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/IMG_1684.jpg" class="img-fluid figure-img"></p>
+<p><img src="images/blockdiagramnew.jpeg" class="img-fluid figure-img"></p>
 <figcaption>Figure 1: Block Diagram of System</figcaption>
 </figure>
 </div>
 </section>
-<section id="calculations" class="level3">
-<h3 class="anchored" data-anchor-id="calculations">Calculations</h3>
+<section id="critical-parameter-calculations" class="level3">
+<h3 class="anchored" data-anchor-id="critical-parameter-calculations">Critical Parameter Calculations</h3>
+<p>The important parameters of our project include the memory needed for the song and the roar, the memory needed for the light sequences, and the time it takes to load in the light sequences into memory.</p>
+<p>The song and roar will be stored as MP3s on an SD card that interfaces with the DFPminiplayer, so the song and roar memory is not a critical parameter to account for.</p>
+<p>For the LED sequences, the UP5K has 120 Kbits or 15 KB of memory. The memory each sequence takes is proportional to the number of bits in each pattern. Because we plan to use 18 LEDs (6 green, 6 purple, and 6 white), if we change the PWM of each LED, that is an 8-bit brightness per LED, for a total of 144 bits per sequence. That gives us a maximum of 833 sequences we can write to memory, which is well beyond what we plan to write.</p>
+<p>To load in the light sequences, we decided to embed the sequence in the bitstream directly, which allows for the load into memory to be approximately ~4-10 ms (see calculation below) on standard SPI while also eliminating the issue with the volatile memory being cleared every time the FPGA is reset by having the configuration controller automatically read in the bitstream at startup.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="images/pwm_calc.png" class="img-fluid figure-img"></p>
 <figcaption>Figure 2: Calculations for PWM Pulse Frequency for Servo Motors</figcaption>
 </figure>
 </div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/transfertime.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 3: Calculations for Rate and Transfer Times</figcaption>
+</figure>
+</div>
 </section>
 <section id="schedule" class="level3">
 <h3 class="anchored" data-anchor-id="schedule">Schedule</h3>
 <p>We are using a Gantt chart, the link can found here: <a href="https://docs.google.com/spreadsheets/d/1uDE0J3yC5c4mSAwDEdWVxK2oUjHBW6A1yyu8N4Wcu1Q/edit?usp=sharing">Gantt chart</a></p>
-<p>The Gantt chart details out all of the main project deliverables as well as weekly tasks. The project will mostly be worked on through co-collaboration and simultaneous programming. However, Erin will be taking the lead on the music mechanism, Caiya will be taking the lead on the light mechanism, and they will work together on the servo touch mechanism.</p>
+<p>The Gantt chart details out all of the main project deliverables as well as weekly tasks. The project will mostly be worked on through co-collaboration and simultaneous programming. However, Erin will be taking the lead on the motor mechanism, Caiya will be taking the lead on the music/light mechanism, and they will work together on the photodiode mechanism.</p>
 </section>
 <section id="fpga-design-details" class="level3">
 <h3 class="anchored" data-anchor-id="fpga-design-details">FPGA Design Details</h3>
-<p>The FPGA will use FSMs to communicate to the microcontroller when to move the servos and turn the light on. The servo mechanism will be our riskiest element of the project. The FPGA will also debounce the button input and tell the MCU when the button has been pressed to either play the programmed music if the music isn’t playing or to stop the programmed music if the music is already playing.</p>
+<p>The FPGA will receive a touch sensor trigger from the microcontroller to know when to move the servos and turn the LEDs on. The servos will then change their angle to open Tootless head up and the LEDs will additionally receive a SRAM signal from our FPGA where the embedded LED show memories will be stored.</p>
 </section>
 <section id="mcu-design-details" class="level3">
 <h3 class="anchored" data-anchor-id="mcu-design-details">MCU Design Details</h3>
-<p>The microcontroller will work with the touch sensor input to then actuate the servo motor(s) that open and close the jaw. The microcontroller will also play the music on the speaker after receiving the signal from the FPGA.</p>
+<p>The microcontroller will work with the touch sensor input to communicate with the FPGA. Additionally it will be using its Analog-to-Digital Converter (ADC) to receive movement input from the photodiode to then play Toothless’ roar via the DFP player.</p>
 </section>
 <section id="touch-sensor-design-details" class="level3">
 <h3 class="anchored" data-anchor-id="touch-sensor-design-details">Touch Sensor Design Details</h3>
 <p>The touch sensor will be the starting trigger that activates the FPGA and MCU to interact with and trigger the servo motor, LED, and speaker.</p>
+</section>
+<section id="photodiode-design-details" class="level3">
+<h3 class="anchored" data-anchor-id="photodiode-design-details">Photodiode Design Details</h3>
+<p>The photodiode will be the trigger that activates the MCU to play the speaker and move the servo motors as a little scare as the user reaches in.</p>
 </section>
 <section id="bill-of-materials" class="level3">
 <h3 class="anchored" data-anchor-id="bill-of-materials">Bill of Materials</h3>
