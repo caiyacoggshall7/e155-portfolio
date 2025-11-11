@@ -165,6 +165,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#design-and-testing-methodology" id="toc-design-and-testing-methodology" class="nav-link" data-scroll-target="#design-and-testing-methodology">Design and Testing Methodology</a></li>
   <li><a href="#technical-documentation" id="toc-technical-documentation" class="nav-link" data-scroll-target="#technical-documentation">Technical Documentation</a></li>
   <li><a href="#results-and-discussion" id="toc-results-and-discussion" class="nav-link" data-scroll-target="#results-and-discussion">Results and Discussion</a></li>
+  <li><a href="#revision-changes" id="toc-revision-changes" class="nav-link" data-scroll-target="#revision-changes">Revision Changes</a></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
   <li><a href="#ai-prototype-summary" id="toc-ai-prototype-summary" class="nav-link" data-scroll-target="#ai-prototype-summary">AI Prototype Summary</a></li>
   </ul></li>
@@ -324,10 +325,31 @@ ul.task-list li input[type="checkbox"] {
 </div>
 <p>These are all my testbenches as seen in the figures above.</p>
 </section>
+<section id="revision-changes" class="level3">
+<h3 class="anchored" data-anchor-id="revision-changes">Revision Changes</h3>
+<p>Before my revisions to the code, I had gotten everything working except I hadn’t incorporated a synchronizer for metastability into my design and when you held down on a button it would still register other button presses.</p>
+<p>There were a number of fixes I had to make for these problems. To start with I tried to fix them without the synchronizer.</p>
+<p>I mostly made changes to my keyscanner.sv and debouncer.sv files. One thing I needed was neq logic in my HOLD state because something was allowing me to release my button press and register new ones when I still had something held down. This is because the holdstate was only checking if rowpressed = 1. rowpressed was all the rows or’d together so 4 input which I’m still unsure how it was able to bypass but one thing I needed to change was in certain areas making that OR an XOR so that it was only true when 1 of the inputs was on. After changing some of my logic, I was able to get my code to not register other presses unless you were in same column. Part of this was that I didn’t have logic that was checking that. Rows are inputs so I was powering each column and so if a column was on, I didn’t have any logic to prevent it from taking in other presses. This was a relatively simple fix by adding in an else if statement for other presses in the SCAN state (the path to figuring this out was not easy). Except, adding in this logic meant that if you held down on a button in a column and pressed down on a second button (in the same column) and released the first button again it wouldn’t register that second button which was a spec!) because it had logic rejecting that. This is when I started messing with my debouncer logic. I added in a CHECK state as well as storing the exact row index and value of the row/column immediately upon detection of the press. The always_ff would then continue to store those same values until it detected that key to be lifted. Then in the HOLD state, it wouldn’t go back to the IDLE scanning state unless the current key that was being pressed was the same as the one it stored at the first press of the FSM. The new debouncer FSM can be found below:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1772.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 16: Revised Debouncer FSM</figcaption>
+</figure>
+</div>
+<p>Adding in the synchronizer added in a host of issues. The first few times I booted it up I only got 0’s locked on the display. I basically ended up having my SCAN states (SCAN0, SCAN1, SCAN2, SCAN3) displace by two so that SCAN0 would go to logic for SCAN2, and SCAN1 to SCAN3. I drew a new block diagram below:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/IMG_1773.jpg" class="img-fluid figure-img"></p>
+<figcaption>Figure 17: Revised Keyscanner FS&lt;</figcaption>
+</figure>
+</div>
+<p>Every now and then there would be an error where if you pressed down on one key and then pressed down on two additional keys in the same row, it would register that first press value again on the display. So there were occasional bugs as it wasn’t perfect. But Prof Spencer was very kind in my checkoff and allowed me to get excellence!</p>
+</section>
 <section id="conclusion" class="level3">
 <h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
 <p>Total Hours Spent on Lab: 67 hours + 25 hours so = 92 hours</p>
 <p>This lab was incredibly frustrating at times and seemingly impossible at others. It was tough. That being said, a rickety profiency is the goal.</p>
+<p>Revision: I was able to complete and get all the mechanisms necessary for excellence working! I feel like I actually understand my code more than ever. A lot of the time that I accrued for my first attempt at this lab wasn’t the most productive because I think I felt scared to change too much when it was so close to working. In my revision, my code looks nothing like it did when I’m started and I think that helped understand why I needed some piece of logic/code or if I even needed it at all!</p>
 </section>
 <section id="ai-prototype-summary" class="level3">
 <h3 class="anchored" data-anchor-id="ai-prototype-summary">AI Prototype Summary</h3>
