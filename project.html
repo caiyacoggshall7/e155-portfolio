@@ -159,7 +159,8 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#project-tooth-or-trick" id="toc-project-tooth-or-trick" class="nav-link active" data-scroll-target="#project-tooth-or-trick">Project: Tooth or Trick</a>
+  <li><a href="#project-tooth-or-trick" id="toc-project-tooth-or-trick" class="nav-link active" data-scroll-target="#project-tooth-or-trick">Project: Tooth or Trick</a></li>
+  <li><a href="#please-see-updated-website-via-this-link" id="toc-please-see-updated-website-via-this-link" class="nav-link" data-scroll-target="#please-see-updated-website-via-this-link">Please see updated website via this link!</a>
   <ul class="collapse">
   <li><a href="#project-description-and-overview" id="toc-project-description-and-overview" class="nav-link" data-scroll-target="#project-description-and-overview">Project Description and Overview</a></li>
   <li><a href="#specifications" id="toc-specifications" class="nav-link" data-scroll-target="#specifications">Specifications</a></li>
@@ -171,7 +172,6 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#touch-sensor-design-details" id="toc-touch-sensor-design-details" class="nav-link" data-scroll-target="#touch-sensor-design-details">Touch Sensor Design Details</a></li>
   <li><a href="#photodiode-design-details" id="toc-photodiode-design-details" class="nav-link" data-scroll-target="#photodiode-design-details">Photodiode Design Details</a></li>
   <li><a href="#bill-of-materials" id="toc-bill-of-materials" class="nav-link" data-scroll-target="#bill-of-materials">Bill of Materials</a></li>
-  </ul></li>
   <li><a href="#mid-way-check-in" id="toc-mid-way-check-in" class="nav-link" data-scroll-target="#mid-way-check-in">Mid Way Check In</a></li>
   <li><a href="#final-check-in" id="toc-final-check-in" class="nav-link" data-scroll-target="#final-check-in">Final Check In</a>
   <ul class="collapse">
@@ -181,6 +181,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#leds-via-sram" id="toc-leds-via-sram" class="nav-link" data-scroll-target="#leds-via-sram">LEDs via SRAM</a></li>
   <li><a href="#servo-motor" id="toc-servo-motor" class="nav-link" data-scroll-target="#servo-motor">Servo Motor</a></li>
   <li><a href="#ir-proximity-sensor" id="toc-ir-proximity-sensor" class="nav-link" data-scroll-target="#ir-proximity-sensor">IR Proximity Sensor</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -195,8 +196,10 @@ ul.task-list li input[type="checkbox"] {
 <h2 class="anchored" data-anchor-id="project-tooth-or-trick">Project: Tooth or Trick</h2>
 <section id="by-caiya-coggshall-erin-wang" class="level5">
 <h5 class="anchored" data-anchor-id="by-caiya-coggshall-erin-wang">By Caiya Coggshall &amp; Erin Wang</h5>
-<p>Please see updated website via <a href="https://erinlywang.github.io/toothless-candy-bucket/">this link</a>!</p>
 </section>
+</section>
+<section id="please-see-updated-website-via-this-link" class="level1">
+<h1>Please see updated website via <a href="https://erinlywang.github.io/toothless-candy-bucket/">this link</a>!</h1>
 <section id="project-description-and-overview" class="level3">
 <h3 class="anchored" data-anchor-id="project-description-and-overview">Project Description and Overview</h3>
 <p>Our project takes inspiration from Halloween candy buckets, themed popcorn buckets from movie theaters, and the lovable Toothless character from “How to Train Your Dragon” (arguably the best movie) to create a Toothless surprise candy bucket complete with music, lights, and an interactive jaw mechanism. Toothless can often be seen in the film being given a pat on the nose. Building off of this, we plan to implement a sensor in the nose of the mechanism that, upon touch, will open the mouth to reveal the candy in the bucket. Additionally, the MCU and FPGA will communicate to indicate when the bucket is open and display a purple LED inside of Toothless’ mouth to recreate his signature fire blast look we see in the movies. Lastly, we are both huge fans of the main theme from the first film “Test Drive”, so we plan to have a button that users can press to play the theme in the background as they engage with our project.</p>
@@ -347,7 +350,6 @@ ul.task-list li input[type="checkbox"] {
 </table>
 <p>I hope you follow along for the journey!</p>
 </section>
-</section>
 <section id="mid-way-check-in" class="level2">
 <h2 class="anchored" data-anchor-id="mid-way-check-in">Mid Way Check In</h2>
 <p>Currently, we have the four subsystems required for the midway check-in working on either the FPGA or the MCU: 1) the servo motor, 2) the music on the DFPlayer mini, 3) the capacitive touch sensor, and 4) the IR proximity sensor. The servo motor is integrated into the FPGA and has been tested using a simple program with a counter that sends pulses that are selectively timed based on the desired servo angle. The DFPlayer mini plays music via a UART connection with the STM32 and successfully passed the test of playing the MP3 track from the SD TF card. The capacitive touch sensor is integrated through GPIO onto the MCU board and successfully turns on an LED on the development board when touched. The subsystem we had agreed would be the trickiest was the IR proximity sensor. The sensor uses an IR LED and an IR photodetector to produce a voltage when a hand comes near the IR LED and reflects the IR rays into the IR PD. The output is sent to an LM385 op-amp to add a large gain to the signal such that the signal is readable by the ADC on the MCU. The ADC then converts the analog voltage to a digital signal for the MCU to read. When a hand is detected, the digital signal successfully rises higher than a set threshold value and turns on an LED on the MCU.</p>
@@ -450,6 +452,7 @@ ul.task-list li input[type="checkbox"] {
 <h3 class="anchored" data-anchor-id="ir-proximity-sensor">IR Proximity Sensor</h3>
 
 
+</section>
 </section>
 </section>
 
